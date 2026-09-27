@@ -1,0 +1,286 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 5.5rem 0 4rem;
+  text-align: center;
+}
+
+/* The logo turns; so does its echo behind the hero. One rotation per
+   minute, felt rather than watched. */
+.heroEcho {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46rem;
+  max-width: none;
+  margin: -23rem 0 0 -23rem;
+  opacity: 0.07;
+  filter: blur(2px);
+  pointer-events: none;
+  animation: spin-slow 60s linear infinite;
+}
+
+.heroInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heroLogo {
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 10px 28px rgba(0, 127, 253, 0.35));
+}
+
+.eyebrow {
+  margin: 0 0 0.9rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-300);
+}
+
+.heroTitle {
+  max-width: 46rem;
+  margin: 0;
+  font-size: clamp(2.1rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.032em;
+  color: #ffffff;
+}
+
+.heroAccent {
+  background-image: linear-gradient(100deg, #ffffff 0%, var(--brand-200) 40%, var(--brand-400) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.heroSubtitle {
+  max-width: 38rem;
+  margin: 1.25rem 0 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--steel-300);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2.1rem;
+}
+
+/* --- at a glance -------------------------------------------------- */
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin-bottom: 3.5rem;
+  border: 1px solid var(--fmt-border);
+  border-radius: 1.125rem;
+  background-color: rgba(11, 18, 32, 0.6);
+  box-shadow: var(--fmt-edge-highlight);
+  overflow: hidden;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 1.15rem 1.35rem;
+  border-right: 1px solid var(--fmt-border);
+}
+
+.fact:last-child {
+  border-right: 0;
+}
+
+.factLabel {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--steel-400);
+}
+
+.factValue {
+  font-family: var(--ifm-heading-font-family);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fmt-foreground);
+}
+
+.factNote {
+  font-size: 0.82rem;
+  color: var(--steel-400);
+}
+
+/* --- section cards ------------------------------------------------ */
+
+.sections {
+  padding-bottom: 5rem;
+}
+
+.sectionsTitle {
+  margin-bottom: 1.25rem;
+  font-size: 1.35rem;
+  color: var(--fmt-foreground);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1.4rem 1.4rem 1.25rem;
+  border: 1px solid var(--fmt-border);
+  border-radius: 1.125rem;
+  background-color: var(--ink-850);
+  background-image: var(--fmt-surface-sheen);
+  box-shadow: var(--fmt-edge-highlight);
+  color: inherit;
+  transition:
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.card:hover {
+  border-color: rgba(0, 185, 253, 0.5);
+  background-color: var(--ink-800);
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.cardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(0, 185, 253, 0.28);
+  border-radius: 0.8rem;
+  background-color: rgba(0, 185, 253, 0.1);
+  color: var(--brand-300);
+}
+
+.cardTitle {
+  font-family: var(--ifm-heading-font-family);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--fmt-foreground);
+}
+
+.cardText {
+  flex: 1;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--steel-300);
+}
+
+.cardMore {
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--brand-300);
+}
+
+.cardMore::after {
+  content: ' \2192';
+}
+
+/* Warm colours mean risk, so only the risk card wears them. */
+.cardRisk .cardIcon {
+  border-color: rgba(253, 133, 1, 0.34);
+  background-color: rgba(253, 133, 1, 0.1);
+  color: #ffa033;
+}
+
+.cardRisk:hover {
+  border-color: rgba(253, 133, 1, 0.55);
+}
+
+.cardRisk .cardMore {
+  color: #ffa033;
+}
+
+.resources {
+  margin: 1.75rem 0 0;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--steel-400);
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media screen and (max-width: 996px) {
+  .hero {
+    padding: 3.5rem 0 2.75rem;
+  }
+
+  .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fact:nth-child(2) {
+    border-right: 0;
+  }
+
+  .fact:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--fmt-border);
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .facts,
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fact {
+    border-right: 0;
+    border-bottom: 1px solid var(--fmt-border);
+  }
+
+  .fact:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroEcho {
+    animation: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}

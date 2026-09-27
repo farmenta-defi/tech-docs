@@ -1,0 +1,10 @@
+{
+  "label": "Liquidations",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "title": "Liquidations",
+    "slug": "/liquidations",
+    "description": "When a loan can be liquidated, what moves between the liquidator, the borrower and the market, and how to run a liquidation yourself."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "label": "Concepts",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "title": "Concepts",
+    "slug": "/concepts",
+    "description": "How Farmenta works underneath: what counts as collateral, how a position is valued, where prices come from, and how interest, fees and losses are handled."
+  }
+}

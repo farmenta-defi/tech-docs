@@ -1,0 +1,189 @@
+---
+title: Managing a position while it is collateral
+description: Claim fees, add liquidity and remove liquidity on a position in Farmenta custody, and the checks each action must pass.
+sidebar_position: 7
+---
+
+## Your position keeps working
+
+Depositing a position as collateral does not freeze it. While the market holds the NFT, you can still do the three things a liquidity provider normally does:
+
+- claim the swap fees it has earned (`collectFees`),
+- add liquidity to it (`increaseLiquidity`),
+- remove part of its liquidity (`decreaseLiquidity`).
+
+It is like a rental flat that you have mortgaged. You still collect the rent and you can still renovate. What you cannot do is strip the flat until it is worth less than the bank is comfortable with.
+
+## A small example
+
+Budi's position has $20,000 of principal and $300 of unclaimed fees. He owes 12,000 USDG on the Blue-chip market (max LTV 65%, LT 75%).
+
+**Claiming fees.** He calls `collectFees`. The $300 leaves the position.
+
+```text
+HF before = $20,300 × 75% / $12,000 = 1.269
+HF after  = $20,000 × 75% / $12,000 = 1.250    (at least 1, so the claim goes through)
+```
+
+**Removing liquidity.** He then tries to remove 10% of the liquidity.
+
+```text
+principal left = $18,000
+borrow limit   = $18,000 × 65% = $11,700
+debt           = $12,000        (above the limit, so the removal is refused)
+```
+
+Removing 5% would work: $19,000 × 65% = $12,350, which covers the $12,000 debt.
+
+## The three functions at a glance
+
+| | `collectFees` | `increaseLiquidity` | `decreaseLiquidity` |
+|---|---|---|---|
+| What it does | Pays out all unclaimed fees | Adds liquidity. Claims all unclaimed fees first. | Removes part of the liquidity. Pays out the principal of that slice and all unclaimed fees. |
+| Who may call | The depositor | The depositor | The depositor |
+| Tokens go to | `to` | Fees and change go to the caller | `to` |
+| Check after the action, with debt | `HF >= 1` | `HF >= 1` | `debtUsd <= collateralUsd × min(maxLTV, LT)` |
+| Price gate, with debt | Yes | Yes | Yes |
+| Minimum value floor on what remains | Not checked | Not checked | Always checked, with or without debt |
+| Pool frozen | Works | Refused | Works |
+| Market paused | Stops | Stops | Stops |
+| Events | `CollectFees` | `CollectFees`, then `LiquidityChanged` (positive) | `CollectFees`, then `LiquidityChanged` (negative) |
+
+Only the recorded depositor of a position can call these functions. Anyone else gets `NotTheDepositor`. None of them charges a protocol fee.
+
+"With debt" matters: a position that owes nothing skips the health check and the price gate, because there is no loan to protect.
+
+## Claiming fees
+
+```solidity
+function collectFees(uint256 tokenId, address to) external;
+```
+
+Uniswap v4 has no separate collect action. The market removes zero liquidity from the position, which pays out the entire fee balance and no principal.
+
+- Both fee tokens go to `to`, native ETH included.
+- With debt, the claim passes the [price gate](./price-oracles.md) and must leave `HF >= 1`. Otherwise it reverts with `PositionWouldBeUnhealthy`.
+- Fees count as collateral only up to 10% of principal, so claiming them can lower your health factor by a limited amount.
+- The `CollectFees` event reports the fees the position had earned, read just before the claim.
+
+## Adding liquidity
+
+```solidity
+function increaseLiquidity(
+    uint256 tokenId,
+    uint128 liquidity,
+    uint128 amount0Max,
+    uint128 amount1Max,
+    ISignatureTransfer.PermitBatchTransferFrom calldata permit,
+    bytes calldata signature
+) external payable;
+```
+
+You choose how much liquidity to add and the most you are willing to pay in each token. You sign a Permit2 batch transfer for the ERC-20 tokens.
+
+- **The pool must still be acceptable.** Before any token moves, the pool passes the same pool checks as a new deposit: listed, not frozen, right tier, both tokens enabled, quoted in USDG, hook permitted. New capital does not go where the policy refuses new positions.
+- **Fees are claimed first and sent to you.** The function claims the position's unclaimed fees to the caller, then adds the liquidity. There is no `to` argument.
+- **Tokens go through Permit2 directly to `PositionManager`.** They never pass through the market. `PositionManager` pays for the addition from what it received and sends the change back to you in the same transaction.
+- **Native ETH.** For a pool that uses native ETH, `msg.value` must equal `amount0Max` exactly. For a pair of two ERC-20 tokens it must be zero. Otherwise the call reverts with `NativeValueMismatch`.
+- **Permit contents.** The permit must list exactly the pool's ERC-20 currencies, in pool order (`PermitDoesNotMatchPool` otherwise). The caller must be the signer. The permit's deadline is also the deadline of the liquidity action.
+- **`liquidity = 0` is rejected** with `ZeroLiquidity`. To claim fees only, use `collectFees`.
+- **With debt**, the position passes the price gate and must have `HF >= 1` after the whole action.
+
+One detail surprises people. The fee claim takes counted fees out of the collateral value. If your position is close to `HF = 1` and the addition is too small to replace the fees that left, the call reverts with `PositionWouldBeUnhealthy`. The fix is to add more, not less.
+
+## Removing liquidity
+
+```solidity
+function decreaseLiquidity(
+    uint256 tokenId,
+    uint128 liq,
+    uint128 min0,
+    uint128 min1,
+    address to
+) external;
+```
+
+- **`to` receives the principal of the slice and every unclaimed fee.** Removing liquidity always pays out the whole fee balance, however small the slice.
+- **`min0` and `min1` bound principal only.** They are your slippage protection: the least amount of each token the removal must return. Fees are paid out as well but never count toward the minimums, so size them from the principal of the slice.
+- **`liq = 0` is rejected** with `ZeroLiquidity`. Use `collectFees`.
+- **More than the position holds is rejected** with `LiquidityExceedsPosition`.
+
+### The minimum value floor
+
+What stays in custody must still clear the pool's minimum position value ($50 or more), measured exactly as at deposit: principal after the removal haircut, fees excluded.
+
+```text
+principalUsd × (1 − removalHaircut) >= minPositionUsd
+```
+
+This applies whether or not the position has debt. Otherwise a position could be emptied to dust while it owes nothing and be borrowed against a moment later.
+
+The consequence: **the whole position never leaves through `decreaseLiquidity`**. To take everything out, repay the debt and call `withdrawCollateral`, which returns the NFT itself.
+
+Because the floor is measured in USD, `decreaseLiquidity` needs a working price even when the position has no debt. `withdrawCollateral` reads no price.
+
+### The borrow limit check
+
+With debt, what you owe must still fit the borrowing limit of what is left:
+
+```text
+debtUsd <= collateralUsd × min(maxLTV, LT)
+```
+
+This is stricter than `HF >= 1`. Removing principal lowers the health factor exactly like borrowing, so it is held to the same limit as a borrow. With only `HF >= 1`, you could borrow at max LTV, then remove liquidity until the loan sat at the liquidation threshold, and the safety margin between the two would be gone.
+
+The lower of max LTV and LT is used because a frozen pool can have an LT at or below its max LTV. In that case LT is the binding limit, so a removal never leaves a position that could be liquidated at once.
+
+If the check fails, the call reverts with `RemovalExceedsBorrowLimit`.
+
+:::warning[A position above max LTV cannot remove liquidity]
+If price moves or interest have already pushed your LTV above the pool's max LTV, every removal is refused until you repay part of the debt.
+:::
+
+## Rules shared by all three
+
+### The price gate
+
+While the position has debt, each action passes the same price gate as `borrow`. Value must not leave a position at a price the market would refuse to lend against.
+
+| Market | Gate |
+|---|---|
+| Blue-chip | USDG inside 0.97 to 1.03, and pool spot within 2% of the Chainlink derived price |
+| Meme | USDG inside 0.97 to 1.03, a 30 minute TWAP available, meme token valued at `min(spot, TWAP)` |
+
+On the Meme market each of these actions also records a TWAP observation for the pool before it prices the position. See [price oracles](./price-oracles.md).
+
+### Recipients that are rejected
+
+`collectFees` and `decreaseLiquidity` revert with `InvalidRecipient` if `to` is one of:
+
+| Rejected `to` | Reason |
+|---|---|
+| The zero address | The tokens would go nowhere |
+| The market itself | The tokens would be stranded in the market |
+| `address(1)` | `PositionManager` reads it as "my caller", which is the market |
+| `address(2)` | `PositionManager` reads it as "myself" |
+| The `PositionManager` address | Tokens left there can be swept by anyone |
+
+The same rule applies to the recipient of a liquidation.
+
+### USDG is always paid out first
+
+Every payout is made one token at a time, and the USDG leg always goes first. In a native ETH pool, sending ETH runs the recipient's code. The same order applies to the change returned by `mintAndDeposit` and `increaseLiquidity`, and to the payout of a partial liquidation. A full seizure is the exception: the position is burned and both tokens go to the liquidator in pool order, after the ledger has been written.
+
+### Frozen pools and paused markets
+
+| State | `collectFees` | `increaseLiquidity` | `decreaseLiquidity` |
+|---|---|---|---|
+| Pool frozen | Works | Refused | Works |
+| Market paused | Stops | Stops | Stops |
+
+A frozen pool takes no new capital, but it never traps what is already there. A pause stops all three, because each of them can rely on an oracle price. While paused you can still repay, and you can still withdraw a position that has no debt. See [pool listing](./pool-listing.md) and [pause and emergency](../risk/pause-and-emergency.md).
+
+## Related pages
+
+- [Collateral: Uniswap v4 positions](./collateral.md)
+- [Health factor, LTV and liquidation threshold](./health-factor.md)
+- [How positions are valued](./position-valuation.md)
+- [FarmentaMarket reference](../reference/farmenta-market.md)
+- [Errors reference](../reference/errors.md)

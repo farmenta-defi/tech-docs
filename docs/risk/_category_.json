@@ -1,0 +1,10 @@
+{
+  "label": "Risk and security",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "title": "Risk and security",
+    "slug": "/risk",
+    "description": "What can go wrong, who bears the loss, and what the protocol does and does not protect against today."
+  }
+}

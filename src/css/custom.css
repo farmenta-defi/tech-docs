@@ -1,0 +1,596 @@
+/* ==================================================================
+   FARMENTA DOCS THEME
+   The same palette as the Farmenta app, sampled from the logo: a cold
+   half (cyan, blue, navy, steel) and a warm half (orange, red).
+
+     cold  = identity, chrome, links, neutral notes
+     warm  = risk, and only risk (warning and danger callouts)
+
+   Dark only. The ground is navy tinted, never pure black.
+   ================================================================== */
+
+:root,
+[data-theme='dark'] {
+  /* --- raw palette ------------------------------------------------ */
+  --brand-100: #d8efff;
+  --brand-200: #a8dfff;
+  --brand-300: #6ecbff;
+  --brand-400: #00b9fd; /* logo cyan */
+  --brand-500: #007ffd; /* logo blue */
+  --brand-600: #0b63e5;
+  --brand-700: #0a4bb0;
+  --brand-900: #011c46; /* logo navy */
+
+  --steel-300: #b3c2d6;
+  --steel-400: #8496b0;
+  --steel-500: #64768f;
+  --steel-600: #45576b; /* logo steel */
+  --steel-700: #2b3a4d;
+
+  --warn: #fd8501; /* logo orange */
+  --danger: #fc082a; /* logo red */
+
+  --ink-950: #05080f;
+  --ink-900: #080d18;
+  --ink-850: #0b1220;
+  --ink-800: #101a2b;
+
+  --fmt-foreground: #e9eff8;
+  --fmt-body: #cfd9e6;
+  --fmt-border: rgba(148, 178, 214, 0.14);
+  --fmt-border-strong: rgba(148, 178, 214, 0.24);
+  --fmt-surface-sheen: linear-gradient(
+    158deg,
+    rgba(148, 178, 214, 0.07) 0%,
+    rgba(148, 178, 214, 0.018) 46%,
+    rgba(148, 178, 214, 0.005) 100%
+  );
+  --fmt-brand-gradient: linear-gradient(135deg, var(--brand-600) 0%, #0a9bf5 55%, var(--brand-400) 100%);
+  --fmt-edge-highlight: inset 0 1px 0 rgba(190, 218, 250, 0.09);
+
+  /* --- Infima mapping --------------------------------------------- */
+  --ifm-color-primary: #00b9fd;
+  --ifm-color-primary-dark: #00a7e4;
+  --ifm-color-primary-darker: #009dd7;
+  --ifm-color-primary-darkest: #0082b1;
+  --ifm-color-primary-light: #19c4ff;
+  --ifm-color-primary-lighter: #26c7ff;
+  --ifm-color-primary-lightest: #4dd2ff;
+
+  --ifm-background-color: var(--ink-950);
+  --ifm-background-surface-color: var(--ink-850);
+  --ifm-font-color-base: var(--fmt-body);
+  --ifm-heading-color: #f3f7fc;
+  --ifm-color-content: var(--fmt-body);
+  --ifm-color-content-secondary: var(--steel-400);
+  --ifm-color-emphasis-100: rgba(148, 178, 214, 0.06);
+  --ifm-color-emphasis-200: rgba(148, 178, 214, 0.1);
+  --ifm-color-emphasis-300: rgba(148, 178, 214, 0.16);
+  --ifm-color-emphasis-400: #45576b;
+  --ifm-color-emphasis-500: #64768f;
+  --ifm-color-emphasis-600: #8496b0;
+  --ifm-color-emphasis-700: #b3c2d6;
+  --ifm-color-emphasis-800: #d5deea;
+  --ifm-color-emphasis-900: #e9eff8;
+
+  --ifm-link-color: var(--brand-300);
+  --ifm-link-hover-color: var(--brand-200);
+  --ifm-link-decoration: none;
+  --ifm-link-hover-decoration: underline;
+
+  --ifm-font-family-base: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ifm-heading-font-family: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ifm-heading-font-weight: 700;
+  --ifm-font-size-base: 100%;
+  --ifm-line-height-base: 1.7;
+  --ifm-code-font-size: 88%;
+
+  --ifm-global-radius: 0.875rem;
+  --ifm-code-border-radius: 0.4rem;
+  --ifm-pre-border-radius: 0.875rem;
+  --ifm-button-border-radius: 0.75rem;
+  --ifm-card-border-radius: 1.125rem;
+
+  --ifm-navbar-background-color: rgba(8, 13, 24, 0.82);
+  --ifm-navbar-height: 4rem;
+  --ifm-navbar-link-color: var(--steel-300);
+  --ifm-navbar-link-hover-color: #ffffff;
+  --ifm-navbar-shadow: none;
+
+  --ifm-footer-background-color: var(--ink-900);
+  --ifm-footer-color: var(--steel-400);
+  --ifm-footer-link-color: var(--steel-300);
+  --ifm-footer-link-hover-color: var(--brand-300);
+  --ifm-footer-title-color: var(--fmt-foreground);
+
+  --ifm-menu-color: var(--steel-300);
+  --ifm-menu-color-active: var(--brand-300);
+  --ifm-menu-color-background-active: rgba(0, 185, 253, 0.1);
+  --ifm-menu-color-background-hover: rgba(148, 178, 214, 0.07);
+
+  --ifm-toc-border-color: var(--fmt-border);
+  --ifm-toc-link-color: var(--steel-400);
+
+  --ifm-table-border-color: var(--fmt-border);
+  --ifm-table-head-background: rgba(148, 178, 214, 0.06);
+  --ifm-table-head-color: var(--fmt-foreground);
+  --ifm-table-stripe-background: rgba(148, 178, 214, 0.025);
+  --ifm-table-cell-padding: 0.7rem 0.9rem;
+
+  --ifm-code-background: rgba(148, 178, 214, 0.1);
+  --ifm-hr-background-color: var(--fmt-border);
+  --ifm-blockquote-border-color: var(--brand-500);
+  --ifm-scrollbar-track-background-color: var(--ink-900);
+  --ifm-scrollbar-thumb-background-color: var(--steel-700);
+  --ifm-scrollbar-thumb-hover-background-color: var(--steel-600);
+
+  --docusaurus-highlighted-code-line-bg: rgba(0, 185, 253, 0.12);
+  --docsearch-text-color: var(--fmt-foreground);
+}
+
+/* ==================================================================
+   Ground
+   ================================================================== */
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--ink-950);
+  /* Ambient vortex: one cold pole, one faint warm pole, as in the app. */
+  background-image:
+    radial-gradient(58rem 42rem at 78% -8%, rgba(0, 127, 253, 0.16), transparent 62%),
+    radial-gradient(46rem 34rem at 6% 4%, rgba(253, 133, 1, 0.045), transparent 60%),
+    radial-gradient(70rem 50rem at 50% 108%, rgba(1, 28, 70, 0.65), transparent 70%);
+  background-attachment: fixed;
+  text-rendering: optimizeLegibility;
+}
+
+#__docusaurus,
+.main-wrapper,
+[class*='docsWrapper'],
+[class*='docRoot'] {
+  background: transparent;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.021em;
+}
+
+::selection {
+  background: rgba(0, 185, 253, 0.28);
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-400);
+  outline-offset: 2px;
+}
+
+/* ==================================================================
+   Navbar
+   ================================================================== */
+
+.navbar {
+  border-bottom: 1px solid var(--fmt-border);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+.navbar__title {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.navbar__link {
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.navbar__link--active {
+  color: var(--brand-300);
+}
+
+.navbar-launch-app {
+  margin-left: 0.5rem;
+  padding: 0.45rem 1rem;
+  border-radius: 0.75rem;
+  background-image: var(--fmt-brand-gradient);
+  color: #ffffff !important;
+  font-weight: 600;
+  box-shadow: var(--fmt-edge-highlight);
+  transition: filter 0.15s ease;
+}
+
+.navbar-launch-app:hover {
+  filter: brightness(1.12);
+  text-decoration: none;
+}
+
+.navbar-launch-app svg {
+  display: none;
+}
+
+.navbar-sidebar {
+  background-color: var(--ink-900);
+}
+
+/* ==================================================================
+   Sidebar and table of contents
+   ================================================================== */
+
+.theme-doc-sidebar-container {
+  border-right: 1px solid var(--fmt-border) !important;
+  background-color: rgba(8, 13, 24, 0.55);
+}
+
+.menu {
+  padding: 1rem 0.75rem !important;
+  font-size: 0.9rem;
+}
+
+.menu__link {
+  border-radius: 0.6rem;
+}
+
+.menu__list-item-collapsible {
+  border-radius: 0.6rem;
+}
+
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 600;
+  color: var(--fmt-foreground);
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--brand-400);
+}
+
+.table-of-contents {
+  font-size: 0.82rem;
+}
+
+.table-of-contents__link--active {
+  color: var(--brand-300);
+  font-weight: 600;
+}
+
+/* ==================================================================
+   Article
+   ================================================================== */
+
+.markdown {
+  --ifm-h2-font-size: 1.6rem;
+  --ifm-h3-font-size: 1.22rem;
+}
+
+.markdown > h2 {
+  margin-top: 2.6rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--fmt-border);
+}
+
+.markdown > h2:first-child,
+.markdown > header + h2 {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.markdown a {
+  text-decoration: underline;
+  text-decoration-color: rgba(110, 203, 255, 0.35);
+  text-underline-offset: 3px;
+}
+
+.markdown a:hover {
+  text-decoration-color: var(--brand-200);
+}
+
+.markdown strong {
+  color: var(--fmt-foreground);
+}
+
+.breadcrumbs__link {
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.breadcrumbs__item--active .breadcrumbs__link {
+  background: rgba(0, 185, 253, 0.12);
+  color: var(--brand-300);
+}
+
+/* Money is read in columns, so digits must not shuffle width. */
+table {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.92rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--fmt-border);
+  border-radius: 0.875rem;
+  overflow: hidden;
+  display: table;
+  width: 100%;
+}
+
+.markdown table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+table thead tr {
+  border-bottom: 0;
+}
+
+table th {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  text-align: left;
+}
+
+table th,
+table td {
+  border: 0;
+  border-bottom: 1px solid var(--fmt-border);
+  vertical-align: top;
+}
+
+table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* --- code --------------------------------------------------------- */
+
+/* Inline code is a small chip. Block code is left to the theme, which is why
+   this rule excludes anything inside <pre>. */
+:not(pre) > code {
+  border: 1px solid var(--fmt-border);
+  color: var(--brand-200);
+  padding: 0.08rem 0.36rem;
+}
+
+a > code {
+  color: inherit;
+}
+
+pre code {
+  border: 0;
+}
+
+.theme-code-block {
+  border: 1px solid var(--fmt-border);
+  box-shadow: var(--fmt-edge-highlight);
+  font-variant-numeric: tabular-nums;
+}
+
+.theme-code-block pre {
+  background-image: var(--fmt-surface-sheen);
+}
+
+[class*='codeBlockTitle'] {
+  border-bottom: 1px solid var(--fmt-border) !important;
+  color: var(--steel-300);
+  font-size: 0.8rem;
+}
+
+/* --- diagrams ----------------------------------------------------- */
+
+.docusaurus-mermaid-container {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+  padding: 1.25rem 1rem;
+  border: 1px solid var(--fmt-border);
+  border-radius: 0.875rem;
+  background-color: rgba(11, 18, 32, 0.6);
+  overflow-x: auto;
+}
+
+/* ==================================================================
+   Callouts. Neutral ones are cold. Orange and red are kept for risk.
+   ================================================================== */
+
+.alert {
+  --ifm-alert-border-left-width: 3px;
+  --ifm-alert-border-radius: 0.875rem;
+  --ifm-alert-foreground-color: var(--fmt-body);
+  --ifm-alert-padding-vertical: 1rem;
+  --ifm-alert-padding-horizontal: 1.15rem;
+  border-style: solid;
+  border-width: 1px 1px 1px 3px;
+  box-shadow: var(--fmt-edge-highlight);
+  color: var(--fmt-body);
+}
+
+.alert a {
+  color: var(--brand-300);
+  text-decoration-color: rgba(110, 203, 255, 0.4);
+}
+
+[class*='admonitionHeading'] {
+  font-family: var(--ifm-heading-font-family);
+  letter-spacing: 0.04em;
+}
+
+.alert--secondary {
+  --ifm-alert-background-color: rgba(148, 178, 214, 0.06);
+  --ifm-alert-border-color: var(--steel-500);
+}
+.alert--secondary [class*='admonitionHeading'] {
+  color: var(--steel-300);
+}
+
+.alert--info {
+  --ifm-alert-background-color: rgba(0, 127, 253, 0.09);
+  --ifm-alert-border-color: var(--brand-500);
+}
+.alert--info [class*='admonitionHeading'] {
+  color: var(--brand-300);
+}
+
+/* "tip" is green by default. The palette has no green, so it is cyan. */
+.alert--success {
+  --ifm-alert-background-color: rgba(0, 185, 253, 0.08);
+  --ifm-alert-border-color: var(--brand-400);
+}
+.alert--success [class*='admonitionHeading'] {
+  color: var(--brand-400);
+}
+
+.alert--warning {
+  --ifm-alert-background-color: rgba(253, 133, 1, 0.09);
+  --ifm-alert-border-color: var(--warn);
+}
+.alert--warning [class*='admonitionHeading'] {
+  color: #ffa033;
+}
+
+.alert--danger {
+  --ifm-alert-background-color: rgba(252, 8, 42, 0.1);
+  --ifm-alert-border-color: var(--danger);
+}
+.alert--danger [class*='admonitionHeading'] {
+  color: #ff5c73;
+}
+
+/* ==================================================================
+   Cards, pagination, footer, search
+   ================================================================== */
+
+.card {
+  background-color: var(--ink-850);
+  background-image: var(--fmt-surface-sheen);
+  border: 1px solid var(--fmt-border);
+  box-shadow: var(--fmt-edge-highlight);
+}
+
+article .card:hover,
+a.card:hover {
+  border-color: rgba(0, 185, 253, 0.45);
+}
+
+.pagination-nav__link {
+  border: 1px solid var(--fmt-border);
+  border-radius: 0.875rem;
+  background-color: rgba(11, 18, 32, 0.6);
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.pagination-nav__link:hover {
+  border-color: rgba(0, 185, 253, 0.45);
+  background-color: rgba(0, 185, 253, 0.06);
+}
+
+.pagination-nav__sublabel {
+  color: var(--steel-400);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pagination-nav__label {
+  font-family: var(--ifm-heading-font-family);
+  color: var(--brand-300);
+}
+
+.footer {
+  border-top: 1px solid var(--fmt-border);
+  font-size: 0.9rem;
+}
+
+.footer__title {
+  font-family: var(--ifm-heading-font-family);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--steel-400);
+}
+
+.footer__copyright {
+  color: var(--steel-500);
+  font-size: 0.82rem;
+}
+
+.button--primary {
+  background-image: var(--fmt-brand-gradient);
+  border: 0;
+  color: #ffffff;
+  box-shadow: var(--fmt-edge-highlight);
+}
+
+.button--primary:hover {
+  color: #ffffff;
+  filter: brightness(1.12);
+}
+
+.button--secondary {
+  background-color: rgba(148, 178, 214, 0.08);
+  border: 1px solid var(--fmt-border-strong);
+  color: var(--fmt-foreground);
+}
+
+.button--secondary:hover {
+  background-color: rgba(148, 178, 214, 0.14);
+  border-color: rgba(0, 185, 253, 0.45);
+  color: #ffffff;
+}
+
+/* Local search */
+.navbar__search-input {
+  border: 1px solid var(--fmt-border);
+  border-radius: 0.75rem;
+  background-color: rgba(148, 178, 214, 0.07);
+  color: var(--fmt-foreground);
+  font-size: 0.88rem;
+}
+
+.navbar__search-input::placeholder {
+  color: var(--steel-500);
+}
+
+[class*='searchBar'] [class*='dropdownMenu'] {
+  background: var(--ink-800) !important;
+  border: 1px solid var(--fmt-border-strong) !important;
+  border-radius: 0.875rem !important;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55) !important;
+}
+
+[class*='searchBar'] [class*='suggestion'] {
+  background: transparent !important;
+  color: var(--fmt-body) !important;
+  border-color: var(--fmt-border) !important;
+}
+
+[class*='searchBar'] [class*='cursor'] [class*='suggestion'] {
+  background: rgba(0, 185, 253, 0.12) !important;
+}
+
+[class*='searchBar'] [class*='hitFooter'] a,
+[class*='searchBar'] mark {
+  color: var(--brand-300) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}

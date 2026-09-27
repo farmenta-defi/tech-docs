@@ -1,0 +1,10 @@
+{
+  "label": "Resources",
+  "position": 8,
+  "link": {
+    "type": "generated-index",
+    "title": "Resources",
+    "slug": "/resources",
+    "description": "A glossary of every term used in these docs, and answers to common questions."
+  }
+}
