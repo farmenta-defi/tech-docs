@@ -26,7 +26,7 @@ Two values in `docusaurus.config.ts` can be set through the environment. Both ha
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `DOCS_URL` | `https://docs-farmenta.vercel.app` | Public address of this site |
+| `DOCS_URL` | `https://tech-docs-pearl.vercel.app` | Public address of this site |
 | `FARMENTA_APP_URL` | `https://app-farmenta.vercel.app/` | Target of the "Launch App" button |
 
 ## Structure

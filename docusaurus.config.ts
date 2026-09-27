@@ -5,7 +5,7 @@ import type {PrismTheme} from 'prism-react-renderer';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 // Where this site is served from.
-const SITE_URL = process.env.DOCS_URL ?? 'https://docs-farmenta.vercel.app';
+const SITE_URL = process.env.DOCS_URL ?? 'https://tech-docs-pearl.vercel.app';
 
 // Where the "Launch App" button points. FARMENTA_APP_URL overrides it, for
 // example to point at a local frontend while developing.
