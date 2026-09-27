@@ -79,7 +79,7 @@ A pause has no maximum duration and no delay. The owner can pause and unpause at
 
 A pause covers a whole market. A freeze covers one pool and has no effect on the vault or on other pools. Both can be active at the same time, and then the stricter column applies.
 
-A frozen pool is often combined with a falling liquidation threshold. The owner can schedule an [LT ramp](./admin-powers.md#tightening-has-no-speed-limit) or lower LT directly, and liquidations run throughout. Freezing a pool is not a grace period for borrowers.
+A frozen pool is often combined with a falling liquidation threshold. The owner can schedule an [LT ramp](./admin-powers.md#how-terms-are-tightened) or lower LT directly, and liquidations run throughout. Freezing a pool is not a grace period for borrowers.
 
 ## How to tell which state you are in
 

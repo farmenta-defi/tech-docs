@@ -719,8 +719,8 @@ On a full seizure `out0` and `out1` are the balance change of `to` across the pa
 
 Every function in this section is restricted to the market owner and reverts with `OwnableUnauthorizedAccount(account)` for anyone else.
 
-:::danger[Owner powers]
-The owner is a single account with no timelock. It can pause the market and upgrade the contract to any new logic, including logic that moves all collateral and all USDG. The code is unaudited. See [admin powers](../risk/admin-powers.md).
+:::info[Owner powers]
+The owner can pause the market and authorize an upgrade of the contract. What each power means for users is described in [owner powers](../risk/admin-powers.md).
 :::
 
 ### `pause` and `unpause`

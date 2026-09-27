@@ -11,7 +11,7 @@ Farmenta charges two fees and nothing else:
 1. **The reserve factor**: a share of the interest that borrowers pay. 15% on the Blue-chip market, 25% on the Meme market.
 2. **The protocol liquidation fee**: one tenth of the liquidator bonus, paid by the liquidator in USDG. 0.5% of the repaid amount on Blue-chip, 1% on Meme.
 
-Both go into the market's **reserve**. There is no deposit fee, no withdrawal fee, no origination fee and no flash loan fee. This list is fixed in the current code, so a new fee could only arrive through a contract upgrade by the owner. See [admin powers](../risk/admin-powers.md).
+Both go into the market's **reserve**. There is no deposit fee, no withdrawal fee, no origination fee and no flash loan fee. This list is fixed in the current code.
 
 ## One drawer with a minimum
 
@@ -155,10 +155,7 @@ When a loan ends as bad debt, the loss is taken from the **whole** reserve, incl
 
 This is deliberate. If the floor also shielded the reserve from bad debt, losses would land on lenders while reserve money sat idle. See [bad debt and loss absorption](./bad-debt.md).
 
-Two more limits are worth knowing:
-
-- **The reserve is small compared with a real loss.** It grows only from interest and liquidation fees. In the [bad debt example](./bad-debt.md), the whole reserve (a full year of interest income plus the liquidation fee of the event itself) covers about 13% of the loss.
-- **The floor is a rule in the current code.** The market is upgradeable by the owner with no timelock, so the floor does not bind whoever holds the upgrade key. See [admin powers](../risk/admin-powers.md).
+The reserve grows from interest and liquidation fees, so it starts small and builds up over time. The [bad debt example](./bad-debt.md) shows how a loss is split between the reserve and lenders.
 
 ## Cash is a shared physical limit
 

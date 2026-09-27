@@ -6,13 +6,28 @@ sidebar_position: 2
 
 ## One account administers the protocol
 
-Think of a building manager who holds the master key. House rules say which doors the manager opens in daily work, but the key itself fits every door. Farmenta's owner account is that manager: the contracts limit what routine operations can do, and the power to upgrade the market sits above all of those limits.
+Think of a building manager. House rules say what the manager may do in daily work: open the lobby, close a floor for repairs, change the visiting hours. Farmenta's owner account is that manager, and the contracts are the house rules. This page lists what the owner can do, what the contracts refuse, and how upgrades fit in.
 
-The owner is a single account. It administers both markets and the [`CollateralPolicy`](../reference/collateral-policy.md) contract that holds every pool listing. Ownership moves in two steps (the new owner must accept), but no owner action has a delay.
+The owner is one account. It administers both markets and the [`CollateralPolicy`](../reference/collateral-policy.md) contract that holds every pool listing. Ownership moves in two steps: the new owner must accept.
 
-:::danger[The upgrade key can take everything]
-`FarmentaMarket` is a UUPS upgradeable contract. Only the owner can authorize an upgrade, and there is no timelock. The market holds the collateral NFTs and the supplied USDG, so the key holder can replace the entire logic, including taking both, in one transaction and without warning. The code is also unaudited. Do not deposit more than you are prepared to lose to a compromised or misused key.
+:::warning[Upgrades are not delayed today]
+`FarmentaMarket` is a UUPS upgradeable contract, and only the owner can authorize an upgrade. An upgrade replaces the market's logic, so it can change any rule on this page, including how collateral and funds are held. Upgrades take effect without a delay today. A timelock on upgrades is planned before the protocol holds real funds, with `pause` kept instant.
 :::
+
+## What the contracts refuse
+
+No owner function can do any of the following:
+
+- **Taking recorded collateral.** No owner function transfers an NFT that has a loan record. `rescueUnaccountedToken` reverts for it.
+- **Withdrawing reserves below the floor.** `withdrawReserves` reverts for any amount above `min(reserves − floor, cash)`.
+- **Loosening terms beyond the tier presets.** No pool can have a max LTV or LT above the preset, a bonus below it, a debt cap above it, or a minimum position value below it.
+- **Opening a pool with no borrowing room.** A pool that accepts new positions always has `maxLTV < LT`.
+- **Blocking exits.** No owner function stops `repay`, stops `withdrawCollateral` for a position with no debt, or stops vault withdrawals. Neither pause nor freeze reaches them.
+- **Changing the interest curve, reserve factor, reserve floor or close factor** with a setter. None exists.
+
+These limits are rules of the current implementation. An upgrade can change them, which is why upgrades are the main trust assumption of the protocol and why a timelock is planned. Every upgrade also has to keep the storage layout intact, so new implementations are tested against the existing layout before release.
+
+Bad debt is a separate matter: it draws on the whole reserve, including the part below the floor. The floor restricts what the owner may withdraw. It does not restrict what the reserve is used for.
 
 ## A worked example: lowering LT
 
@@ -28,9 +43,9 @@ The owner lowers the pool's LT from 75% to 70%. Nothing else changes.
 HF after  = 13,733 × 0.70 / 10,000 = 0.96
 ```
 
-Budi's loan is now liquidatable. The close factor is 50% (his HF is between 0.9 and 1, and the debt is above 100 USDG), so Rina, a liquidator, can repay up to 5,000 USDG and receive liquidity worth $5,250. The 5% bonus, $250, comes out of Budi's position, although he did nothing wrong.
+Budi's loan is now liquidatable. The close factor is 50% (his HF is between 0.9 and 1, and the debt is above 100 USDG), so Rina, a liquidator, can repay up to 5,000 USDG and receive liquidity worth $5,250. The 5% bonus, $250, comes out of Budi's position.
 
-The contract allows this on purpose. It lets the owner react quickly to a broken oracle, a hook that changed behaviour, or a token that collapsed. The cost of that speed is carried by borrowers.
+The contract allows this on purpose. It lets the owner react quickly to a broken oracle, a hook that changed behaviour, or a token that collapsed, which protects lenders. Borrowers can protect themselves by borrowing below the maximum and by watching the LT schedule of their pool.
 
 ## What the owner can do
 
@@ -38,7 +53,7 @@ The contract allows this on purpose. It lets the owner react quickly to a broken
 
 | Power | Effect on users | Limits enforced by the contract |
 |---|---|---|
-| **Upgrade the implementation** | Replaces all market logic. Can change any rule on this page, move collateral NFTs, move USDG, or rewrite the debt ledger. Also the only way to change the oracle, valuer, policy and interest rate model addresses, the reserve factor, the reserve floor, the close factor and the debt cap per market. | Owner only. No timelock, no delay, no second signer. |
+| **Upgrade the implementation** | Replaces all market logic. Can change any rule on this page, move collateral NFTs, move USDG, or rewrite the debt ledger. Also the only way to change the oracle, valuer, policy and interest rate model addresses, the reserve factor, the reserve floor, the close factor and the debt cap per market. | Owner only. Not delayed today. A timelock is planned before the protocol holds real funds. |
 | **`pause` and `unpause`** | Stops every action that adds risk or reads a price, including liquidations. Repay and withdrawals stay open. See [Pause and emergency behaviour](./pause-and-emergency.md). | Instant. No maximum duration. Each market is paused separately. |
 | **`withdrawReserves(amount, to)`** | Moves reserve USDG to any address. Does not change the share price, because lender funds already exclude the reserve. It does use the same cash lenders withdraw from. | Only the part above the reserve floor (1% of `totalAssets` in Blue-chip, 2.5% in Meme), and never more than the cash in the market. |
 | **`rescueUnaccountedToken(tokenId, to)`** | Sends out a position NFT that reached the market without being recorded, for example one minted directly to the market's address. | Reverts for any NFT that has a loan record, so it cannot be used on deposited collateral. |
@@ -60,13 +75,13 @@ The contract allows this on purpose. It lets the owner react quickly to a broken
 
 The tier presets are listed in [Risk parameters](../reference/risk-parameters.md), and the listing lifecycle is explained in [Pool listing](../concepts/pool-listing.md).
 
-## Tightening has no speed limit
+## How terms are tightened
 
-:::warning[A healthy loan can be made liquidatable by the owner]
-The owner can lower a pool's LT as far and as fast as it wants. A ramp is optional. With `updateTerms` the change is immediate, and in a frozen pool LT can be set at or below max LTV in one step.
+:::warning[Lowering LT affects existing loans]
+A lower LT applies to loans that are already open, so a loan close to its limit can become liquidatable. The owner can lower LT at once with `updateTerms`, or gradually with a ramp. In a frozen pool LT can be set at or below max LTV.
 :::
 
-The only mitigation is visibility. When the owner does use a ramp, the schedule (start value, target, start time, duration) is stored on-chain, so you can compute the exact moment your position crosses `HF = 1`:
+A ramp makes the change visible in advance. The schedule (start value, target, start time, duration) is stored on-chain, so you can compute the exact moment your position crosses `HF = 1`:
 
 ```text
 effective LT = ltStart − (ltStart − ltTarget) × elapsed / duration
@@ -74,7 +89,7 @@ effective LT = ltStart − (ltStart − ltTarget) × elapsed / duration
 
 Read it with `effectiveLt(poolId)` or `listingOf(poolId)` on the policy contract. A `LtRampScheduled` event is emitted when a ramp is set, and `PoolTermsUpdated` when terms are rewritten directly.
 
-Freezing a pool gives borrowers no grace period. Freezing, changing terms and unfreezing can all happen in the same block, and liquidations keep running in a frozen pool.
+Freezing a pool does not add a grace period. Liquidations keep running in a frozen pool, and so do `repay`, `collectFees`, `decreaseLiquidity` and `withdrawCollateral`.
 
 ## The removal haircut
 
@@ -86,26 +101,9 @@ The contract cannot measure what a hook really keeps. It trusts the number in th
 If the listed haircut is higher than what the hook keeps, the liquidator receives more than `repay × (1 + bonus)`. In the worst case, a hook that keeps nothing in a pool listed at the 2,000 bps cap with a 5% bonus, the liquidator receives `1.05 / (1 − 0.2)`, about 131% of what they repay. The difference is taken from the borrower, or from lenders if the position ends in bad debt.
 :::
 
-Raising the haircut from 0 to 2,000 bps multiplies the recognised collateral value by 0.8. A loan with HF 1.15 drops to 0.92 and can be seized in the same block.
+Raising the haircut from 0 to 2,000 bps multiplies the recognised collateral value by 0.8, so a loan with HF 1.15 drops to 0.92.
 
 The opposite error hurts lenders: a haircut below the hook's real cut means liquidators receive less than they pay for, liquidations stop being profitable, and bad debt builds up.
-
-## What the owner cannot do through normal operations
-
-As long as the implementation is not upgraded, the contracts refuse the following:
-
-- **Taking recorded collateral.** No owner function transfers an NFT that has a loan record. `rescueUnaccountedToken` reverts for it.
-- **Withdrawing reserves below the floor.** `withdrawReserves` reverts for any amount above `min(reserves − floor, cash)`.
-- **Loosening terms beyond the tier presets.** No pool can have a max LTV or LT above the preset, a bonus below it, a debt cap above it, or a minimum position value below it.
-- **Opening a pool with no borrowing room.** A pool that accepts new positions always has `maxLTV < LT`.
-- **Blocking exits.** No owner function stops `repay`, stops `withdrawCollateral` for a position with no debt, or stops vault withdrawals. Neither pause nor freeze reaches them.
-- **Changing the interest curve, reserve factor, reserve floor or close factor** with a setter. None exists.
-
-:::danger[These limits do not bind the key holder]
-An upgrade can change every rule in the list above in a single transaction. The reserve floor, the custody guard and the preset bounds protect against accidents and routine operations. They do not protect against the owner key, whether it is misused or stolen. An honest upgrade is a risk too: a mistake in the storage layout of a new implementation can corrupt the debt ledger.
-:::
-
-Bad debt is a separate matter: it draws on the whole reserve, including the part below the floor. The floor restricts what the owner may withdraw. It does not restrict what the reserve is used for.
 
 ## The team's liquidation keeper
 
@@ -113,9 +111,9 @@ The team plans to operate its own liquidation keeper and a recording service for
 
 - **It will compete with public liquidators.** Outside the case below, it executes as soon as a position reads `HF < 1`.
 - **Its profit will go to the team treasury.**
-- **It can profit from owner decisions.** The owner can make loans liquidatable by lowering LT, and the team's keeper is then in a position to earn the bonus.
+- **It follows a waiting rule during LT ramps.** Lowering LT can make loans liquidatable, and the team's keeper could then earn the bonus. The rule below is there to let public liquidators go first.
 
-To reduce that conflict, the keeper follows one rule: while an LT ramp is running on a pool, it waits 60 seconds after it first reads `HF < 1` before it executes a position in that pool, so that public liquidators can go first.
+The rule: while an LT ramp is running on a pool, it waits 60 seconds after it first reads `HF < 1` before it executes a position in that pool, so that public liquidators can go first.
 
 :::warning[The 60 second wait is a keeper rule, not a contract rule]
 Nothing on-chain enforces the wait. It applies only while the ramp is running. Once the ramp has finished, LT stays at its target and the keeper competes directly again. An instant change through `updateTerms` has no ramp and therefore no wait.

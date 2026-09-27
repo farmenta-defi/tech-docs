@@ -40,9 +40,7 @@ You remain the recorded depositor. The market stores one loan record per positio
 
 Debt is tracked per position. Two positions from the same wallet are two separate loans with two separate health factors.
 
-:::warning[Custody risk]
-The market contract holds your NFT, and the market is upgradeable by a single owner account with no timelock. Read [admin powers](../risk/admin-powers.md) before you deposit.
-:::
+How the market contract is administered is described in [owner powers](../risk/admin-powers.md).
 
 ## Three ways to deposit
 

@@ -97,8 +97,8 @@ There are no setters for these. Pointing a market at a new policy, valuer, oracl
 
 The tier of a market (Blue-chip or Meme) is stored in proxy storage, not in an immutable, because one implementation serves both proxies. For the same reason `InterestRateModel` is one contract that carries both curves and takes the tier as an argument.
 
-:::warning[Upgrade power]
-The owner can replace the whole logic of a market in one transaction, with no timelock and no warning. The market holds the collateral NFTs and the lenders' USDG, so this is the largest trust assumption in the protocol. The code is unaudited. Read [admin powers](../risk/admin-powers.md) before you deposit.
+:::info[Upgrades]
+Only the owner can authorize an upgrade of a market. Upgrades are not delayed today, and a timelock is planned before the protocol holds real funds. See [owner powers](../risk/admin-powers.md).
 :::
 
 ## Storage layout

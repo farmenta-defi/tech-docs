@@ -123,7 +123,7 @@ This table lists every action in the protocol and whether it carries a protocol 
 
 The two bold rows are the **whole** of Farmenta's economics. Everything else is zero. There is no deposit fee, no withdrawal fee, no origination fee and no flash loan fee.
 
-This list is fixed in the current code. The market is upgradeable by the owner with no timelock, so a new fee could only arrive through a contract upgrade. See [admin powers](../risk/admin-powers.md).
+This list is fixed in the current code.
 
 :::info
 The liquidator bonus is not a protocol fee. It is paid out of the borrower's collateral to the liquidator. The protocol's part is the extra 0.5% that the liquidator pays on top of the repayment.

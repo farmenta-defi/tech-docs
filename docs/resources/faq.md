@@ -48,7 +48,7 @@ Withdrawals are paid from cash, the USDG that is idle in the market. The rest is
 
 ### Can I lose money as a lender?
 
-Yes. If a position is liquidated for less than its debt, the shortfall is bad debt. The reserve absorbs it first, and whatever is left lowers the share price for every lender in that market. You are also exposed to the risks of unaudited code and of the owner key. See [Bad debt](../concepts/bad-debt.md) and the [Risk overview](../risk/overview.md).
+Yes. If a position is liquidated for less than its debt, the shortfall is bad debt. The reserve absorbs it first, and whatever is left lowers the share price for every lender in that market. See [Bad debt](../concepts/bad-debt.md) and the [Risk overview](../risk/overview.md).
 
 ### Can a loss in the Meme market affect Blue-chip lenders?
 
@@ -140,19 +140,19 @@ The two tokens of the pool, taken from a slice of the position's liquidity, not 
 
 ### Is the code audited?
 
-No. The contracts have not been audited. The source code is public in the [smart contract repository](https://github.com/farmenta-defi/smart-contract). See the [Risk overview](../risk/overview.md).
+Not yet. The contracts are tested with unit tests, tests against a fork of the live chain and invariant tests, and an audit has not been completed. The source code is public in the [smart contract repository](https://github.com/farmenta-defi/smart-contract). See the [Risk overview](../risk/overview.md).
 
 ### Who controls the contracts?
 
-A single owner account. It can upgrade the market contract with no timelock, pause markets, list and freeze pools, change pool terms and withdraw reserves above the floor. An upgrade can replace all logic, including the rules that limit the owner. See [Owner powers and upgradeability](../risk/admin-powers.md).
+The owner account. It can upgrade the market contract, pause markets, list and freeze pools, change pool terms within the tier presets, and withdraw reserves above the floor. Upgrades are not delayed today, and a timelock on upgrades is planned before the protocol holds real funds. See [Owner powers and upgradeability](../risk/admin-powers.md).
 
 ### Can the owner take my collateral or my USDG?
 
-Not through normal operations: no owner function moves a recorded collateral NFT or lender funds. Through an upgrade, yes: the owner key can replace the market's logic in one transaction and take both. The limits in the contract protect against accidents, not against the key holder. See [Owner powers and upgradeability](../risk/admin-powers.md).
+No owner function moves a recorded collateral NFT or lender funds. The market is an upgradeable contract, and an upgrade can change its rules, so upgradeability is a trust assumption of the protocol. A timelock on upgrades is planned before the protocol holds real funds. See [Owner powers and upgradeability](../risk/admin-powers.md).
 
 ### Can the owner change the terms of my loan?
 
-Yes. The owner can lower your pool's liquidation threshold, raise its liquidator bonus, or raise the removal haircut of a frozen pool, and the change applies to existing loans at once. Terms can never be looser than the tier presets, and there is no limit on how fast they are tightened. See [Owner powers and upgradeability](../risk/admin-powers.md).
+Yes. The owner can lower your pool's liquidation threshold, raise its liquidator bonus, or raise the removal haircut of a frozen pool, and the change applies to existing loans at once. Terms can never be looser than the tier presets, and a scheduled ramp is visible on-chain before it takes effect. See [Owner powers and upgradeability](../risk/admin-powers.md).
 
 ### What happens if the market is paused?
 

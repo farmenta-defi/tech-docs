@@ -8,10 +8,10 @@ sidebar_position: 1
 
 Farmenta works like a pawnshop that accepts an item whose price moves every second. The item is a Uniswap v4 liquidity position, the loan is in USDG, and the shop sells part of the item when the loan is no longer safely covered. Every step of that depends on something that can fail: the code, the account that administers it, the price feeds, the pool the position sits in, the USDG token, and the chain itself.
 
-This section lists those dependencies plainly. It does not try to reassure you. Read it before you supply USDG, deposit a position, or run a liquidation bot.
+This section lists those dependencies, who carries each risk, and what limits it. Read it before you supply USDG, deposit a position, or run a liquidation bot.
 
-:::danger[Unaudited code and a single upgrade key]
-Farmenta's smart contracts have not been audited and are not deployed yet. The market contract is upgradeable, the upgrade is controlled by one owner account, and there is no timelock. Whoever holds that key can replace the market's logic in a single transaction and take both the collateral NFTs and the supplied USDG. See [Owner powers and upgradeability](./admin-powers.md).
+:::info[Security status]
+Farmenta's contracts are open source and are not deployed yet. They have not been audited yet. The market contract is upgradeable and administered by the owner account. Upgrades take effect without a delay today, and a timelock on upgrades is planned before the protocol holds real funds. See [Owner powers and upgradeability](./admin-powers.md).
 :::
 
 ## A small example
@@ -27,17 +27,17 @@ Three different things can push that number below 1 and make the loan liquidatab
 
 - **The market moves.** ETH falls, the position is now worth $7,900, and `HF = 7,900 × 0.75 / 6,000 = 0.9875`.
 - **Time passes.** Interest is added to the debt every second. With no price change at all, the debt eventually grows until `HF < 1`.
-- **The owner changes the terms.** If the owner lowers the pool's LT, the same position and the same debt give a lower HF. Budi did nothing, and he still pays the liquidator bonus.
+- **The pool's terms change.** If the owner lowers the pool's LT, the same position and the same debt give a lower HF.
 
-The first two are the ordinary risks of any collateralized loan. The third is a consequence of how Farmenta is administered, and it is described in full on the [owner powers](./admin-powers.md) page.
+The first two are the ordinary risks of any collateralized loan. The third exists so that the owner can react quickly to a broken price feed or a failing token, and it is described on the [owner powers](./admin-powers.md) page.
 
 ## Summary of the main risks
 
 | Risk | Who bears it | What limits it | Details |
 |---|---|---|---|
-| **Unaudited smart contracts.** A bug can lose or lock funds. | Everyone | Open source code, automated tests. No audit. | [Owner powers](./admin-powers.md) |
-| **Upgrade key.** One owner account can upgrade the market (UUPS) with no timelock, and an upgrade can take the collateral NFTs and the supplied USDG in one transaction. | Everyone | Nothing on-chain. You trust the key holder. | [Owner powers](./admin-powers.md) |
-| **The owner can lower a pool's LT** and make a healthy loan liquidatable. There is no rate limit and no floor on tightening. | Borrowers | A scheduled LT ramp is stored on-chain and readable. The owner is not required to use one. | [Owner powers](./admin-powers.md) |
+| **Smart contract risk.** As in any protocol, a bug can lose or lock funds. | Everyone | Open source code, unit tests, tests against a fork of the live chain, and invariant tests. An audit has not been completed yet. | [Contract architecture](../reference/architecture.md) |
+| **Upgradeability.** The market is an upgradeable contract administered by the owner account. An upgrade can change any rule of the market, including how collateral and funds are held. | Everyone | No owner function moves recorded collateral or lender funds. Upgrades are not delayed today, and a timelock on upgrades is planned before the protocol holds real funds. | [Owner powers](./admin-powers.md) |
+| **Pool terms can be tightened.** The owner can lower a pool's LT, which lowers the health factor of existing loans in that pool. | Borrowers | Terms can never be looser than the tier presets. A scheduled LT ramp is stored on-chain, so borrowers can see it coming. | [Owner powers](./admin-powers.md) |
 | **Oracle risk.** Chainlink is the only price source for ETH and USDG. The ETH/USD feed has a 24 hour heartbeat. | Borrowers and lenders | Prices older than 25 hours are rejected. Inside that window a lagging price is held only by the 2% spot gate on borrowing. | [Oracle, market and chain risks](./oracle-and-market-risks.md) |
 | **Meme token price manipulation and rug risk.** A thin pool can be pushed, and a token can lose nearly all its value. | Meme market borrowers and lenders | Low max LTV (30%) and LT (40%), small debt caps, `min(spot, TWAP)` at borrow, pool by pool listing. Meme pools are not listed with real funds until a guard against single-transaction price pushes is in place. | [Oracle, market and chain risks](./oracle-and-market-risks.md) |
 | **Bad debt is socialized to lenders.** When collateral no longer covers a debt, the reserve absorbs the loss first and lenders of that market absorb the rest. | Lenders of the affected market | Conservative LTV and LT, debt caps, the reserve, and full isolation between the two markets. | [Bad debt](../concepts/bad-debt.md) |
@@ -49,12 +49,12 @@ The first two are the ordinary risks of any collateralized loan. The third is a 
 
 ## If you lend
 
-You supply USDG to one market and receive its share token. Your risks, in order of severity:
+You supply USDG to one market and receive its share token. Your risks:
 
-1. **The upgrade key and unaudited code.** Both can lose everything you supplied. No parameter protects against them.
-2. **Bad debt.** If a position is liquidated for less than its debt, the shortfall is taken from the market's reserve, all of it if needed. What the reserve cannot cover lowers the value of every share in that market. The reserve grows only from interest and liquidation fees, so in a young market it is small compared with a single large loss.
-3. **Liquidations that cannot run.** While the market is paused, while USDG is paused by its issuer, or while a Chainlink price is older than 25 hours, liquidations revert. Prices can keep falling in that time, and a loan that was merely unhealthy can turn into bad debt.
-4. **Waiting for cash.** You can withdraw only up to the USDG that is idle in the market. The rest of your funds is lent out and returns as borrowers repay.
+1. **Bad debt.** If a position is liquidated for less than its debt, the shortfall is taken from the market's reserve, all of it if needed. What the reserve cannot cover lowers the value of every share in that market. The reserve grows only from interest and liquidation fees, so in a young market it is small compared with a single large loss.
+2. **Liquidations that cannot run.** While the market is paused, while USDG is paused by its issuer, or while a Chainlink price is older than 25 hours, liquidations revert. Prices can keep falling in that time, and a loan that was merely unhealthy can turn into bad debt.
+3. **Waiting for cash.** You can withdraw only up to the USDG that is idle in the market. The rest of your funds is lent out and returns as borrowers repay.
+4. **Smart contract and upgrade risk.** Your funds are held by the market contract. See the [security status](#what-you-are-trusting) above.
 
 :::warning[Market isolation is the only diversification]
 A loss in the Meme market never touches Blue-chip lenders, and the reverse. Inside one market, every lender shares every loss in proportion to their shares. Choose the market with that in mind: the Meme market pays a higher rate because its collateral is far more likely to fail.
@@ -69,7 +69,7 @@ Your position stays in its Uniswap pool and keeps earning fees, but the market h
 1. **Liquidation.** Below `HF = 1`, a liquidator repays part of your debt and receives a slice of your liquidity worth that amount plus a bonus (5% in Blue-chip, 10% in Meme, or more if the pool's listing says so). In the Meme market, and in the Blue-chip market when `HF < 0.9` or the debt is under 100 USDG, the whole debt can be closed at once.
 2. **Terms that change under you.** The owner can lower LT, raise the liquidator bonus, or raise the removal haircut of a frozen pool. Each change applies to existing loans immediately.
 3. **Meme pricing modes.** In the Meme market your position can be valued at the pool's current price with a 20% cut when price observations stop arriving. A position that looks healthy on the time-weighted price can become liquidatable.
-4. **The upgrade key.** Your NFT is in the market's custody. An upgrade can move it.
+4. **Custody.** Your NFT is held by the market contract until your debt is zero. See the [security status](#what-you-are-trusting) above.
 
 :::warning[Out of range is not a trigger, a falling value is]
 A position that goes out of range on the lower side holds only the risk token. It is not liquidated for being out of range, but its value now follows that token one for one, so HF falls faster.
@@ -91,7 +91,7 @@ Bad debt is never charged to the liquidator. The contract caps what you repay at
 
 ## Not financial advice
 
-This documentation describes how the protocol is designed to behave. It is not financial, legal or tax advice, and it is not a recommendation to lend, borrow or liquidate. Nothing here guarantees that the contracts behave as described. Use the protocol only with funds you can afford to lose.
+This documentation describes how the protocol is designed to behave. It is not financial, legal or tax advice, and it is not a recommendation to lend, borrow or liquidate. As with any on-chain protocol, use it only with funds you can afford to lose.
 
 ## Related pages
 

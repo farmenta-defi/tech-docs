@@ -145,7 +145,7 @@ The price of isolation is that liquidity is split between two markets.
 :::warning[Lenders can lose part of their deposit]
 If a loan ends as bad debt and the reserve is too small to cover it, the remainder is socialized to every lender of that market through a lower share price. Nothing else stands between a loss and lenders.
 
-The reserve grows only from interest and liquidation fees, so it is small compared with the loans it stands behind. In the example above it covered about 13% of a single loss.
+The reserve grows from interest and liquidation fees, so it starts small and builds up over time. In the example above, after one year, it covered about 13% of the loss.
 
 Losses are shared in proportion to shares held at the moment the bad debt is recorded.
 :::

@@ -107,7 +107,7 @@ t = 1% / (utilization × rate × reserve factor)
 | 50% | 2.50% | 0.375% | **5.3 years** |
 | 80% | 4.00% | 0.600% | 2.1 years |
 
-At normal utilization, withdrawal is closed for years. That is the intended result for a protocol whose code is unaudited.
+At normal utilization, withdrawal is closed for years. That is the intended result: the reserve is a buffer for lenders first and revenue second.
 
 ### Why the floor follows lender funds, not debt
 
