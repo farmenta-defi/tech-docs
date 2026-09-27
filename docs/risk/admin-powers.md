@@ -10,8 +10,8 @@ Think of a building manager. House rules say what the manager may do in daily wo
 
 The owner is one account. It administers both markets and the [`CollateralPolicy`](../reference/collateral-policy.md) contract that holds every pool listing. Ownership moves in two steps: the new owner must accept.
 
-:::warning[Upgrades are not delayed today]
-`FarmentaMarket` is a UUPS upgradeable contract, and only the owner can authorize an upgrade. An upgrade replaces the market's logic, so it can change any rule on this page, including how collateral and funds are held. Upgrades take effect without a delay today. A timelock on upgrades is planned before the protocol holds real funds, with `pause` kept instant.
+:::warning[Upgrades wait out a two day timelock]
+`FarmentaMarket` is a UUPS upgradeable contract, and only the owner can authorize an upgrade. An upgrade replaces the market's logic, so it can change any rule on this page, including how collateral and funds are held. Every upgrade has to be scheduled on-chain first and can be installed only two days later, so lenders and borrowers can see it coming. `pause` stays instant. See [the upgrade timelock](#the-upgrade-timelock).
 :::
 
 ## What the contracts refuse
@@ -25,9 +25,40 @@ No owner function can do any of the following:
 - **Blocking exits.** No owner function stops `repay`, stops `withdrawCollateral` for a position with no debt, or stops vault withdrawals. Neither pause nor freeze reaches them.
 - **Changing the interest curve, reserve factor, reserve floor or close factor** with a setter. None exists.
 
-These limits are rules of the current implementation. An upgrade can change them, which is why upgrades are the main trust assumption of the protocol and why a timelock is planned. Every upgrade also has to keep the storage layout intact, so new implementations are tested against the existing layout before release.
+These limits are rules of the current implementation. An upgrade can change them, which is why upgrades are the main trust assumption of the protocol and why every upgrade waits out a timelock. Every upgrade also has to keep the storage layout intact, so new implementations are tested against the existing layout before release.
 
 Bad debt is a separate matter: it draws on the whole reserve, including the part below the floor. The floor restricts what the owner may withdraw. It does not restrict what the reserve is used for.
+
+## The upgrade timelock
+
+An upgrade works like a notice on the building's door: the new house rules are posted first, and they apply only after the notice period. On Farmenta the notice is a schedule stored on-chain, and the notice period is two days.
+
+A small example: on Monday at 10:00 the owner calls `scheduleUpgrade` with the address of a new implementation. The market emits `UpgradeScheduled` with an `eta` of Wednesday at 10:00. Until then `upgradeToAndCall` reverts. From Wednesday at 10:00 the owner can install that implementation, and no other. If it is not installed within 14 days of the `eta`, the schedule expires: the owner has to cancel it and schedule again, which starts a new two day wait.
+
+| Rule | Detail |
+|---|---|
+| Delay | `TIMELOCK_DELAY` is 2 days. Before the `eta`, `upgradeToAndCall` reverts with `UpgradeNotReady`. |
+| Installation window | `TIMELOCK_GRACE` is 14 days. After `eta + 14 days`, `upgradeToAndCall` reverts with `UpgradeExpired`. An expired schedule stays in place until the owner cancels it. |
+| One schedule at a time | A second `scheduleUpgrade` reverts with `UpgradeAlreadyScheduled` until the first one is cancelled or installed. |
+| The code is fixed | The schedule records the hash of the code at the scheduled address. `scheduleUpgrade` refuses an address that holds no code and an account that only points to other code. Installing reverts with `ImplementationCodeChanged` if the code at the address is no longer the code that was scheduled. |
+| Cancelling | `cancelUpgrade` takes effect at once and emits `UpgradeCancelled`. Scheduling again starts a full delay. |
+| Fixed constants | Both constants are part of the implementation's code and have no setter. Changing them takes an upgrade, which waits out the current delay. |
+
+You can check for a pending upgrade at any time:
+
+- `pendingUpgrade()` returns the scheduled implementation and its `eta`, or zeros when nothing is scheduled.
+- `pendingUpgradeCodehash()` returns the hash of the code that was scheduled. Compare it with the code at the scheduled address.
+- The market emits `UpgradeScheduled` and `UpgradeCodeBound` when an upgrade is scheduled, `UpgradeCancelled` when it is withdrawn, and `Upgraded` when it is installed.
+
+Read the views as well as the events. A schedule made before you started listening is still pending.
+
+What the timelock does and does not do:
+
+- It gives notice. Lenders and borrowers have two days to repay, withdraw collateral and redeem shares before a new implementation can be installed. The owner keeps the power to upgrade.
+- Vault withdrawals are limited by the cash in the market. At high utilization a lender may not be able to withdraw everything before the `eta`.
+- `pause`, `unpause` and the owner's powers on `CollateralPolicy` are not delayed.
+- The data passed to `upgradeToAndCall` is not part of the schedule. It is run by the scheduled implementation, so it can only run code that implementation contains.
+- The code hash is compared when the upgrade is scheduled and when it is installed. The market cannot enforce that the code stays at the address in between, so check the scheduled address during the delay.
 
 ## A worked example: lowering LT
 
@@ -53,7 +84,8 @@ The contract allows this on purpose. It lets the owner react quickly to a broken
 
 | Power | Effect on users | Limits enforced by the contract |
 |---|---|---|
-| **Upgrade the implementation** | Replaces all market logic. Can change any rule on this page, move collateral NFTs, move USDG, or rewrite the debt ledger. Also the only way to change the oracle, valuer, policy and interest rate model addresses, the reserve factor, the reserve floor, the close factor and the debt cap per market. | Owner only. Not delayed today. A timelock is planned before the protocol holds real funds. |
+| **Upgrade the implementation** | Replaces all market logic. Can change any rule on this page, move collateral NFTs, move USDG, or rewrite the debt ledger. Also the only way to change the oracle, valuer, policy and interest rate model addresses, the reserve factor, the reserve floor, the close factor and the debt cap per market. | Owner only. The implementation must be scheduled first and can be installed from 2 days later, for 14 days, and only while the code at its address is the code that was scheduled. See [the upgrade timelock](#the-upgrade-timelock). |
+| **`scheduleUpgrade` and `cancelUpgrade`** | Schedules a new implementation, or withdraws the scheduled one. Scheduling changes nothing in the market until the upgrade is installed. | One schedule at a time. The scheduled address must hold code. Cancelling is instant, and scheduling again starts a full delay. |
 | **`pause` and `unpause`** | Stops every action that adds risk or reads a price, including liquidations. Repay and withdrawals stay open. See [Pause and emergency behaviour](./pause-and-emergency.md). | Instant. No maximum duration. Each market is paused separately. |
 | **`withdrawReserves(amount, to)`** | Moves reserve USDG to any address. Does not change the share price, because lender funds already exclude the reserve. It does use the same cash lenders withdraw from. | Only the part above the reserve floor (1% of `totalAssets` in Blue-chip, 2.5% in Meme), and never more than the cash in the market. |
 | **`rescueUnaccountedToken(tokenId, to)`** | Sends out a position NFT that reached the market without being recorded, for example one minted directly to the market's address. | Reverts for any NFT that has a loan record, so it cannot be used on deposited collateral. |

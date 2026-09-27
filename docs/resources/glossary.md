@@ -202,6 +202,10 @@ The state of a Meme pool when no valid TWAP exists: its newest observation is mo
 
 The risk class of a pool: Blue-chip or Meme. A pool takes the riskier tier of its two tokens, and the tier decides which market accepts it, which presets bound its terms and which price source is used. See [Markets](../overview/markets.md).
 
+### Timelock
+
+The waiting period between the moment the owner schedules an upgrade of a market and the moment it can be installed: 2 days. A scheduled upgrade that is not installed within 14 days after that expires. See [Owner powers and upgradeability](../risk/admin-powers.md#the-upgrade-timelock).
+
 ### TWAP
 
 Time-weighted average price. Farmenta's `TwapRecorder` stores observations of a Meme pool's price and returns the average over the last 30 minutes, which is harder to move than the spot price. See [TwapRecorder](../reference/twap-recorder.md).

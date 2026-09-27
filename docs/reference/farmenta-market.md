@@ -68,6 +68,7 @@ In both states interest keeps accruing, and borrowers can always repay and take 
 | `liquidate` | Reverts | Works |
 | `accrue` | Works | Works |
 | `withdrawReserves`, `rescueUnaccountedToken`, `rescueUnaccountedEth` | Works | Works |
+| `scheduleUpgrade`, `cancelUpgrade`, `upgradeToAndCall` | Works | Works (not tied to a pool) |
 
 A call that is stopped by the pause reverts with `EnforcedPause()`. A call that is stopped by a freeze reverts with `PoolFrozenForNewPositions(poolId)` on the collateral side and `PoolNotOpenForBorrowing(poolId)` on `borrow`.
 
@@ -720,7 +721,7 @@ On a full seizure `out0` and `out1` are the balance change of `to` across the pa
 Every function in this section is restricted to the market owner and reverts with `OwnableUnauthorizedAccount(account)` for anyone else.
 
 :::info[Owner powers]
-The owner can pause the market and authorize an upgrade of the contract. What each power means for users is described in [owner powers](../risk/admin-powers.md).
+The owner can pause the market and upgrade the contract through a timelock. What each power means for users is described in [owner powers](../risk/admin-powers.md).
 :::
 
 ### `pause` and `unpause`
@@ -783,18 +784,69 @@ Reverts with `InvalidRecipient(to)` for the zero address and the market. Emits `
 
 There is no rescue function for ERC-20 tokens.
 
-### Upgrades and ownership
+### `scheduleUpgrade`
+
+```solidity
+uint256 public constant TIMELOCK_DELAY = 2 days;
+uint256 public constant TIMELOCK_GRACE = 14 days;
+
+function scheduleUpgrade(address newImplementation) external onlyOwner
+```
+
+Schedules `newImplementation` to replace the current implementation. It can be installed from `eta = block.timestamp + TIMELOCK_DELAY`. The schedule records the hash of the code at the address, and an upgrade is held to that hash.
+
+| Check | Error |
+|---|---|
+| `newImplementation` is not the zero address | `ZeroAddress()` |
+| The address holds code | `ImplementationHasNoCode(implementation)` |
+| The code does not start with `0xEF`, which marks an account that only points to other code | `ImplementationIsAPointer(implementation)` |
+| No other upgrade is scheduled | `UpgradeAlreadyScheduled(implementation)` |
+
+Emits `UpgradeScheduled(newImplementation, eta)` and `UpgradeCodeBound(newImplementation, codehash)`.
+
+One upgrade waits at a time. No sequence of calls brings an `eta` forward: cancelling and scheduling again starts a full delay.
+
+### `cancelUpgrade`
+
+```solidity
+function cancelUpgrade() external onlyOwner
+```
+
+Withdraws the scheduled upgrade, at once. Reverts with `NoUpgradeScheduled()` when nothing is scheduled. Emits `UpgradeCancelled(newImplementation)`.
+
+### `upgradeToAndCall`
+
+Inherited from OpenZeppelin.
+
+```solidity
+function upgradeToAndCall(address newImplementation, bytes memory data) public payable virtual onlyProxy
+```
+
+Replaces the implementation of the proxy. Only the owner can call it, and only for the implementation that was scheduled.
+
+| Check | Error |
+|---|---|
+| `newImplementation` is the scheduled implementation | `UpgradeNotScheduled(implementation)` |
+| `block.timestamp` is at or after the `eta` | `UpgradeNotReady(implementation, eta)` |
+| `block.timestamp` is at most `eta + TIMELOCK_GRACE` | `UpgradeExpired(implementation, expiredAt)` |
+| The code at the address has the hash that was scheduled | `ImplementationCodeChanged(implementation, scheduled, found)` |
+
+Emits `Upgraded(implementation)`. The upgrade uses up its schedule, so installing the same implementation a second time takes a new schedule and a new delay. A call that reverts leaves the schedule as it was.
+
+`data` is not part of the schedule. It is run by the scheduled implementation.
+
+What the timelock means for users is described in [owner powers](../risk/admin-powers.md#the-upgrade-timelock).
+
+### Ownership
 
 These functions are inherited from OpenZeppelin.
 
 ```solidity
-function upgradeToAndCall(address newImplementation, bytes memory data) public payable virtual onlyProxy
 function transferOwnership(address newOwner) public virtual override onlyOwner
 function acceptOwnership() public virtual
 function renounceOwnership() public virtual onlyOwner
 ```
 
-- `upgradeToAndCall` replaces the implementation of the proxy. Only the owner can call it. It emits `Upgraded(implementation)`.
 - `transferOwnership` nominates a new owner and emits `OwnershipTransferStarted`. The transfer completes when the nominee calls `acceptOwnership`, which emits `OwnershipTransferred`.
 
 ## Views on the market
@@ -815,6 +867,9 @@ All views use the ledger as of the last accrual. They do not add the interest th
 | `totalReservesWithdrawn() returns (uint256)` | The running total of reserves the owner has withdrawn. |
 | `reserveFloorBps() returns (uint16)` | The reserve floor rate, in basis points. |
 | `paused() returns (bool)` | Whether the market is paused. |
+| `pendingUpgrade() returns (address implementation, uint256 eta)` | The scheduled implementation and the earliest time it can be installed. Both are zero when nothing is scheduled. |
+| `pendingUpgradeCodehash() returns (bytes32)` | The hash of the code the scheduled implementation held when it was scheduled, or zero when nothing is scheduled. |
+| `TIMELOCK_DELAY() returns (uint256)`, `TIMELOCK_GRACE() returns (uint256)` | The upgrade delay (2 days) and the installation window after it (14 days), in seconds. |
 | `owner() returns (address)`, `pendingOwner() returns (address)` | The owner and the nominated owner. |
 | `positionManager()`, `policy()`, `valuer()`, `oracle()`, `interestRateModel()` | The addresses of the dependencies. |
 

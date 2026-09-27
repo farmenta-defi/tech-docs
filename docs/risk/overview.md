@@ -11,7 +11,7 @@ Farmenta works like a pawnshop that accepts an item whose price moves every seco
 This section lists those dependencies, who carries each risk, and what limits it. Read it before you supply USDG, deposit a position, or run a liquidation bot.
 
 :::info[Security status]
-Farmenta's contracts are open source and are not deployed yet. They have not been audited yet. The market contract is upgradeable and administered by the owner account. Upgrades take effect without a delay today, and a timelock on upgrades is planned before the protocol holds real funds. See [Owner powers and upgradeability](./admin-powers.md).
+Farmenta's contracts are open source and are not deployed yet. They have not been audited yet. The market contract is upgradeable and administered by the owner account. Every upgrade is scheduled on-chain first and can be installed only two days later. See [Owner powers and upgradeability](./admin-powers.md).
 :::
 
 ## A small example
@@ -36,7 +36,7 @@ The first two are the ordinary risks of any collateralized loan. The third exist
 | Risk | Who bears it | What limits it | Details |
 |---|---|---|---|
 | **Smart contract risk.** As in any protocol, a bug can lose or lock funds. | Everyone | Open source code, unit tests, tests against a fork of the live chain, and invariant tests. An audit has not been completed yet. | [Contract architecture](../reference/architecture.md) |
-| **Upgradeability.** The market is an upgradeable contract administered by the owner account. An upgrade can change any rule of the market, including how collateral and funds are held. | Everyone | No owner function moves recorded collateral or lender funds. Upgrades are not delayed today, and a timelock on upgrades is planned before the protocol holds real funds. | [Owner powers](./admin-powers.md) |
+| **Upgradeability.** The market is an upgradeable contract administered by the owner account. An upgrade can change any rule of the market, including how collateral and funds are held. | Everyone | No owner function moves recorded collateral or lender funds. Every upgrade is scheduled on-chain first and can be installed only after a two day timelock, which gives users time to exit. | [Owner powers](./admin-powers.md) |
 | **Pool terms can be tightened.** The owner can lower a pool's LT, which lowers the health factor of existing loans in that pool. | Borrowers | Terms can never be looser than the tier presets. A scheduled LT ramp is stored on-chain, so borrowers can see it coming. | [Owner powers](./admin-powers.md) |
 | **Oracle risk.** Chainlink is the only price source for ETH and USDG. The ETH/USD feed has a 24 hour heartbeat. | Borrowers and lenders | Prices older than 25 hours are rejected. Inside that window a lagging price is held only by the 2% spot gate on borrowing. | [Oracle, market and chain risks](./oracle-and-market-risks.md) |
 | **Meme token price manipulation and rug risk.** A thin pool can be pushed, and a token can lose nearly all its value. | Meme market borrowers and lenders | Low max LTV (30%) and LT (40%), small debt caps, `min(spot, TWAP)` at borrow, pool by pool listing. Meme pools are not listed with real funds until a guard against single-transaction price pushes is in place. | [Oracle, market and chain risks](./oracle-and-market-risks.md) |

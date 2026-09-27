@@ -204,6 +204,20 @@ The ERC-20 events of the share token. A deposit also emits `Transfer` from the z
 
 `assets` is in USDG with 6 decimals. `shares` and `value` are in share units with 9 decimals.
 
+### Upgrades
+
+```solidity
+event UpgradeScheduled(address indexed newImplementation, uint256 eta);
+event UpgradeCodeBound(address indexed newImplementation, bytes32 codehash);
+event UpgradeCancelled(address indexed newImplementation);
+```
+
+`scheduleUpgrade` emits `UpgradeScheduled`, then `UpgradeCodeBound`. `eta` is the timestamp from which the implementation can be installed, and it stays installable for 14 days after that. `codehash` is the hash of the code at the address when it was scheduled.
+
+`cancelUpgrade` emits `UpgradeCancelled`. An upgrade that is installed emits `Upgraded`, listed under [administration](#administration). Every schedule ends in exactly one of the two.
+
+A schedule that expires emits nothing. It stays pending until the owner cancels it. To know whether an upgrade waits now, read `pendingUpgrade()` on the market: a schedule made before you started listening is still pending.
+
 ### Administration
 
 These events are inherited from OpenZeppelin.
@@ -212,12 +226,12 @@ These events are inherited from OpenZeppelin.
 |---|---|
 | `Paused(address account)` | The owner pauses the market. |
 | `Unpaused(address account)` | The owner unpauses the market. |
-| `Upgraded(address indexed implementation)` | The proxy is pointed at a new implementation. |
+| `Upgraded(address indexed implementation)` | The proxy is pointed at a new implementation, which was scheduled before. |
 | `Initialized(uint64 version)` | The proxy is initialized. |
 | `OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner)` | The owner nominates a new owner. |
 | `OwnershipTransferred(address indexed previousOwner, address indexed newOwner)` | The nominated owner accepts, or ownership is set at initialization. |
 
-`Paused`, `Upgraded` and `OwnershipTransferred` are the events to watch if you monitor the owner's powers. See [admin powers](../risk/admin-powers.md).
+`Paused`, `UpgradeScheduled`, `Upgraded` and `OwnershipTransferred` are the events to watch if you monitor the owner's powers. See [admin powers](../risk/admin-powers.md).
 
 ## CollateralPolicy
 
@@ -311,6 +325,9 @@ The age of the newest `Recorded` event of a pool tells you how close the pool is
 | `ReservesWithdrawn` | `FarmentaMarket` | `to` |
 | `UnaccountedTokenRescued` | `FarmentaMarket` | `tokenId`, `to` |
 | `UnaccountedEthRescued` | `FarmentaMarket` | `to` |
+| `UpgradeScheduled` | `FarmentaMarket` | `newImplementation` |
+| `UpgradeCodeBound` | `FarmentaMarket` | `newImplementation` |
+| `UpgradeCancelled` | `FarmentaMarket` | `newImplementation` |
 | `Deposit` | `FarmentaMarket` (ERC-4626) | `sender`, `owner` |
 | `Withdraw` | `FarmentaMarket` (ERC-4626) | `sender`, `receiver`, `owner` |
 | `TokenConfigured` | `CollateralPolicy` | `currency` |

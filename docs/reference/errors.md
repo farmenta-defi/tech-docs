@@ -15,7 +15,7 @@ A small example: Budi tries to borrow 7,000 USDG against a position worth $10,00
 ## How to read an error
 
 - **Simulate before you send.** A simulated call (`eth_call`, or `simulateContract` in viem) returns the error without costing gas.
-- **Use a complete ABI.** Market logic runs from linked libraries, and the market calls other contracts. To decode every revert of a market call, combine the ABIs of `FarmentaMarket`, `MarketDebt`, `MarketMint`, `MarketLiquidity`, `MarketLiquidation`, `CollateralPolicy`, `PriceOracle`, `TwapRecorder` and `PositionValuer`. The liquidation errors, for example, are declared only in `MarketLiquidation`.
+- **Use a complete ABI.** Market logic runs from linked libraries, and the market calls other contracts. To decode every revert of a market call, combine the ABIs of `FarmentaMarket`, `MarketDebt`, `MarketMint`, `MarketLiquidity`, `MarketLiquidation`, `MarketUpgrade`, `CollateralPolicy`, `PriceOracle`, `TwapRecorder` and `PositionValuer`. The liquidation errors, for example, are declared only in `MarketLiquidation`.
 - **Mind the units.** Arguments named `...Usd` are USD scaled by 1e18. Debt, caps and reserves are USDG with 6 decimals. Health factors are scaled by 1e18. Arguments ending in `Bps` are basis points.
 - **An error can come from several functions.** The tables name the functions that throw it.
 
@@ -94,6 +94,22 @@ Collateral admission, `mintAndDeposit` and `increaseLiquidity`.
 | `NothingToRepay(uint256 tokenId)` | The repay amount came out as zero. | Pass a `repayAmount` above zero. |
 | `FeePurchaseUnderfunded(uint256 required, uint256 available)` | The position's fees are worth more than the seizure allows, and the budget left after `repay` does not cover the fee leg the liquidator has to buy. | Pass a `repayAmount` of `debt × closeFactor` plus at least `required`. When the close factor is 100%, a `repayAmount` of at least the full debt leaves no debt to buy fees for. |
 | `SeizureBelowMinimum(uint256 out0, uint256 out1)` | The liquidator would receive less than `minOut0` or `minOut1`. The arguments are what it would have received. | Quote again and lower the minimums, or skip the liquidation. |
+
+## MarketUpgrade
+
+`scheduleUpgrade`, `cancelUpgrade` and `upgradeToAndCall`. All three are owner functions.
+
+| Error | Meaning | What you can do |
+|---|---|---|
+| `ZeroAddress()` | `scheduleUpgrade`: the implementation is the zero address. | Owner only. Pass the address of the new implementation. |
+| `ImplementationHasNoCode(address implementation)` | `scheduleUpgrade`: the address holds no code. | Owner only. Deploy the implementation first, then schedule it. |
+| `ImplementationIsAPointer(address implementation)` | `scheduleUpgrade`: the code at the address starts with `0xEF`, so the account only points to other code. | Owner only. Schedule the address of the implementation contract. |
+| `UpgradeAlreadyScheduled(address implementation)` | `scheduleUpgrade`: another upgrade is scheduled. `implementation` is the one that waits. | Owner only. Install it, or withdraw it with `cancelUpgrade`. |
+| `NoUpgradeScheduled()` | `cancelUpgrade`: nothing is scheduled. | Nothing to cancel. |
+| `UpgradeNotScheduled(address implementation)` | `upgradeToAndCall`: this implementation is not the scheduled one, or nothing is scheduled. | Owner only. Schedule it with `scheduleUpgrade` and wait for the `eta`. |
+| `UpgradeNotReady(address implementation, uint256 eta)` | `upgradeToAndCall`: the delay has not passed. `eta` is the earliest timestamp. | Owner only. Wait until `eta`. |
+| `UpgradeExpired(address implementation, uint256 expiredAt)` | `upgradeToAndCall`: the installation window closed at `expiredAt`. | Owner only. Cancel the schedule and schedule again, which starts a new delay. |
+| `ImplementationCodeChanged(address implementation, bytes32 scheduled, bytes32 found)` | `upgradeToAndCall`: the code at the address no longer has the hash that was scheduled. | Owner only. Cancel the schedule. |
 
 ## MarketLens
 

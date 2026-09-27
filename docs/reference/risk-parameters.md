@@ -36,7 +36,7 @@ Parameters fall into three groups:
 | Per tier (one value per market) | Close factor, reserve factor, reserve floor, interest curve, market debt cap, price check at borrow | Fixed in the contracts, not adjustable per pool |
 | Shared by both markets | Minimum debt, fee cap, removal haircut ceiling, oracle parameters | Fixed in the contracts, not adjustable per pool |
 
-The values in the second and third groups have no setter function. They change only through a contract upgrade, which is described in [admin powers](../risk/admin-powers.md).
+The values in the second and third groups have no setter function. They change only through a contract upgrade, which has to wait out a two day timelock. See [admin powers](../risk/admin-powers.md).
 
 :::info[Live values are read on-chain]
 This page shows the presets. The terms that apply to a given pool are stored in its listing and can be stricter than the tables below.

@@ -52,7 +52,7 @@ A keeper is an automated program. The team plans to run keepers for two jobs: re
 
 ### Owner
 
-The owner is the admin account. It lists pools, sets and tightens risk parameters, can pause a market, and can withdraw the part of the reserve that lies above the reserve floor. The owner can also upgrade the market contract. These powers are significant and are described in full in [owner powers and upgradeability](../risk/admin-powers.md).
+The owner is the admin account. It lists pools, sets and tightens risk parameters, can pause a market, and can withdraw the part of the reserve that lies above the reserve floor. The owner can also upgrade the market contract, after a two day timelock. These powers are significant and are described in full in [owner powers and upgradeability](../risk/admin-powers.md).
 
 ## The life of a loan
 

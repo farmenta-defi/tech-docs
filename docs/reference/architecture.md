@@ -79,7 +79,7 @@ See the [Uniswap v4 documentation](https://docs.uniswap.org/contracts/v4/overvie
 
 ## One proxy type, everything else is plain
 
-Only `FarmentaMarket` sits behind a proxy. It uses the UUPS pattern: the upgrade logic lives in the implementation, and `_authorizeUpgrade` is restricted to the owner.
+Only `FarmentaMarket` sits behind a proxy. It uses the UUPS pattern: the upgrade logic lives in the implementation. `_authorizeUpgrade` is restricted to the owner and accepts only the implementation that was scheduled, once its timelock has passed.
 
 `CollateralPolicy`, `PositionValuer`, `PriceOracle`, `InterestRateModel` and `TwapRecorder` are plain, non-upgradeable contracts. The market stores the addresses of its dependencies as immutables of the implementation:
 
@@ -98,7 +98,7 @@ There are no setters for these. Pointing a market at a new policy, valuer, oracl
 The tier of a market (Blue-chip or Meme) is stored in proxy storage, not in an immutable, because one implementation serves both proxies. For the same reason `InterestRateModel` is one contract that carries both curves and takes the tier as an argument.
 
 :::info[Upgrades]
-Only the owner can authorize an upgrade of a market. Upgrades are not delayed today, and a timelock is planned before the protocol holds real funds. See [owner powers](../risk/admin-powers.md).
+Only the owner can authorize an upgrade of a market. The new implementation is scheduled with `scheduleUpgrade` and can be installed from `TIMELOCK_DELAY` (2 days) later, for `TIMELOCK_GRACE` (14 days), and only while the code at its address is the code that was scheduled. See [owner powers](../risk/admin-powers.md#the-upgrade-timelock).
 :::
 
 ## Storage layout
@@ -125,6 +125,9 @@ struct Layout {
     uint16 reserveFactorBps;
     uint16 reserveFloorBps;
     uint256 totalReservesWithdrawn;
+    address pendingImplementation;
+    uint64 upgradeEta;
+    bytes32 pendingCodehash;
 }
 ```
 
@@ -140,14 +143,15 @@ The market exposes thin functions and runs the work from libraries that are depl
 | `MarketMint` | Collateral admission, `mintAndDeposit`, `increaseLiquidity`. |
 | `MarketLiquidity` | `collectFees`, `decreaseLiquidity`, and the recipient rule for payouts. |
 | `MarketLiquidation` | The whole of `liquidate`: valuation, the seizure plan, ledger updates, payouts. |
-| `MarketLedger` | The storage layout above. It declares where state lives, so the market and the four libraries all write the same slots. |
+| `MarketUpgrade` | The upgrade timelock: scheduling, cancelling, and the check that lets a scheduled implementation through. |
+| `MarketLedger` | The storage layout above. It declares where state lives, so the market and the five libraries all write the same slots. |
 
 Pure arithmetic sits in internal libraries that are compiled into their callers: `DebtMath`, `LiquidationMath`, `PriceMath`, `PositionAmounts`, `TierPresets` and `HookPermissions`.
 
 What stays in the market is what has to be visible from outside: the pause check, the reentrancy guard, the ERC-4626 surface and the owner functions.
 
 :::info[Events and errors come from the market address]
-Because the libraries run by `delegatecall`, every event they emit is logged by the market proxy, and every error they throw reverts the market call. To decode all of them, combine the ABI of `FarmentaMarket` with the ABIs of the four libraries. The liquidation errors, for example, are declared only in `MarketLiquidation`.
+Because the libraries run by `delegatecall`, every event they emit is logged by the market proxy, and every error they throw reverts the market call. To decode all of them, combine the ABI of `FarmentaMarket` with the ABIs of the five libraries. The liquidation errors, for example, are declared only in `MarketLiquidation`.
 :::
 
 ## Units
@@ -210,7 +214,7 @@ The vault uses a decimals offset of 3. Shares carry three more decimals than USD
 
 | Contract | Owner |
 |---|---|
-| `FarmentaMarket` (each proxy) | `Ownable2StepUpgradeable`. The owner can pause, withdraw reserves above the floor, rescue unaccounted assets, and upgrade. |
+| `FarmentaMarket` (each proxy) | `Ownable2StepUpgradeable`. The owner can pause, withdraw reserves above the floor, rescue unaccounted assets, and upgrade through the timelock. |
 | `CollateralPolicy` | `Ownable2Step`. The owner configures tokens, the hook allowlist, listings, freezes and LT ramps. |
 | `PriceOracle`, `TwapRecorder`, `PositionValuer`, `InterestRateModel`, `MarketLens`, `LiquidatorHelper` | No owner and no privileged function. |
 

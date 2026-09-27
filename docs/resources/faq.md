@@ -144,11 +144,11 @@ Not yet. The contracts are tested with unit tests, tests against a fork of the l
 
 ### Who controls the contracts?
 
-The owner account. It can upgrade the market contract, pause markets, list and freeze pools, change pool terms within the tier presets, and withdraw reserves above the floor. Upgrades are not delayed today, and a timelock on upgrades is planned before the protocol holds real funds. See [Owner powers and upgradeability](../risk/admin-powers.md).
+The owner account. It can upgrade the market contract, pause markets, list and freeze pools, change pool terms within the tier presets, and withdraw reserves above the floor. An upgrade has to be scheduled on-chain first and can be installed only two days later. See [Owner powers and upgradeability](../risk/admin-powers.md).
 
 ### Can the owner take my collateral or my USDG?
 
-No owner function moves a recorded collateral NFT or lender funds. The market is an upgradeable contract, and an upgrade can change its rules, so upgradeability is a trust assumption of the protocol. A timelock on upgrades is planned before the protocol holds real funds. See [Owner powers and upgradeability](../risk/admin-powers.md).
+No owner function moves a recorded collateral NFT or lender funds. The market is an upgradeable contract, and an upgrade can change its rules, so upgradeability is a trust assumption of the protocol. Every upgrade waits out a two day timelock, which gives you time to repay, withdraw your collateral or redeem your shares first. See [Owner powers and upgradeability](../risk/admin-powers.md).
 
 ### Can the owner change the terms of my loan?
 
