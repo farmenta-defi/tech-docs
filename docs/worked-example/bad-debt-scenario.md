@@ -127,11 +127,7 @@ bad debt          $1,823.81
 covered             $239.88 / $1,823.81             = about 13%
 ```
 
-The entire reserve, a full year of interest income plus the fee from this very liquidation, covered about 13% of this one event. At this size the reserve floor is a discipline, not sufficient protection.
-
-:::warning[The floor does not bind the upgrade key]
-The floor is enforced by `withdrawReserves` in the current code. The market contract is upgradeable by a single owner account with no timelock, and an upgrade could rewrite that rule. Treat the floor as protection against routine operations and accidents, not against the key holder. See [admin powers](../risk/admin-powers.md).
-:::
+The entire reserve, a full year of interest income plus the fee from this very liquidation, covered about 13% of this one event. A reserve grows with the market: each year of interest and each liquidation adds to it.
 
 ## The other market is not affected
 

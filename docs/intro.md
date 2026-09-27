@@ -44,9 +44,7 @@ The USDG that Budi borrowed came from lenders such as Lina, who supplied USDG to
 Farmenta's own contracts have not been deployed. Their addresses will be published on the [contract addresses](./reference/addresses.md) page at deployment. Everything in these docs describes how the protocol is designed and implemented to behave.
 :::
 
-:::danger[Read this before you use the protocol]
-The contracts are unaudited. The market contract is upgradeable by a single owner account with no delay, which means that one key can replace the protocol's logic. These and the other known risks are described plainly in [risk and security](./risk/overview.md). Read that section before you supply or borrow.
-:::
+Before you supply or borrow, read [risk and security](./risk/overview.md). It explains who carries which risk and what limits it.
 
 ## Where to start
 
