@@ -80,7 +80,7 @@ A contract attached to a Uniswap v4 pool that runs at set points of a swap or a 
 
 ### Hook permission bits
 
-The lowest 14 bits of a hook's address, which encode the callbacks the hook is allowed to run. Farmenta reads them to reject hooks that could interfere with removing liquidity or charge the caller when liquidity is added, unless the owner has allowlisted the hook after review. See [Pool listing](../concepts/pool-listing.md).
+The lowest 14 bits of a hook's address, which encode the callbacks the hook is allowed to run. Farmenta reads them to reject hooks that could interfere with removing liquidity, act before liquidity is added, or charge the caller when liquidity is added, unless the owner has allowlisted the hook after review. See [Pool listing](../concepts/pool-listing.md).
 
 ## K
 

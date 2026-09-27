@@ -116,13 +116,13 @@ Many Uniswap v4 pools have a hook, a contract that runs at certain points of a s
 
 Two protections apply before a pool is accepted:
 
-- **Permission check.** A hook's address encodes which callbacks it can run. A hook passes automatically only if it cannot act when liquidity is removed and cannot charge the caller when liquidity is added. For such hooks, no later change of their code can block a liquidation or a withdrawal, because Uniswap never calls them at those points. Passing the check says nothing about swaps: such a hook can still set fees or act on every swap, and its source code may be unpublished. That affects the price at which liquidators sell seized tokens and the pool's spot price used by the 2% gate.
+- **Permission check.** A hook's address encodes which callbacks it can run. A hook passes automatically only if it cannot act when liquidity is removed, cannot act before liquidity is added, and cannot charge the caller when liquidity is added. For such hooks, no later change of their code can block a liquidation or a withdrawal, because Uniswap never calls them at those points. Passing the check says nothing about swaps: such a hook can still set fees or act on every swap, and its source code may be unpublished. That affects the price at which liquidators sell seized tokens and the pool's spot price used by the 2% gate.
 - **Manual review and allowlist.** A hook that fails the check can be admitted by the owner after review. If it keeps part of the tokens on removal, the pool is listed with a [removal haircut](./admin-powers.md#the-removal-haircut).
 
 What remains:
 
 - An upgradeable hook can change its behaviour after the review. For an allowlisted hook that could mean blocking removals, which would strand collateral and make loans impossible to liquidate, or taking a larger cut than the listed haircut.
-- A hook that runs when liquidity is added can move the pool price around your addition in `mintAndDeposit` or `increaseLiquidity`. Your cost is bounded by the maximum amounts you sign. Lenders are not affected, because collateral is valued at oracle prices.
+- A hook that runs before liquidity is added can move the pool price around your addition in `mintAndDeposit` or `increaseLiquidity`. Such a hook fails the permission check and is accepted only through the allowlist, after review. In a pool with an allowlisted hook of this kind, your cost is bounded by the maximum amounts you sign. Lenders are not affected, because collateral is valued at oracle prices.
 - The contract cannot measure a hook's real cut. It trusts the listed haircut.
 
 Mitigation after listing is the owner's: freeze the pool, ramp its LT down, or adjust the haircut. Each of those has its own cost for borrowers, described in [Owner powers](./admin-powers.md).

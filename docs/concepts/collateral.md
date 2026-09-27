@@ -110,7 +110,7 @@ The minimum value is measured on principal only. Unclaimed fees do not count tow
 
 A Uniswap v4 pool can have a hook: a contract that runs extra code at certain moments, for example before a swap or after liquidity is removed. Uniswap encodes which callbacks a hook can run in the lowest 14 bits of the hook's own address. The permissions can therefore be read from the address alone, without calling the hook and without trusting it.
 
-Farmenta rejects a hook whose address carries any of these four flags:
+Farmenta rejects a hook whose address carries any of these five flags:
 
 | Flag | Why it is refused |
 |---|---|
@@ -118,6 +118,7 @@ Farmenta rejects a hook whose address carries any of these four flags:
 | `afterRemoveLiquidity` | Same: it runs on every removal and could make it fail. |
 | `afterRemoveLiquidityReturnsDelta` | The hook could take a cut of the tokens that leave the position. |
 | `afterAddLiquidityReturnsDelta` | The hook could charge whoever adds liquidity, which would bill you during `mintAndDeposit` or `increaseLiquidity` without adding to your collateral. |
+| `beforeAddLiquidity` | The hook runs before liquidity is added and could move the pool price first, so you would add at a price the hook chose during `mintAndDeposit` or `increaseLiquidity`. |
 
 A pool with no hook passes. A hook that carries one of these flags is accepted only if the owner has put that exact hook address on the allowlist after reviewing its source code.
 

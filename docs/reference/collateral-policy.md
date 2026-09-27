@@ -411,7 +411,8 @@ The `HookPermissions` library builds the mask from the flags of Uniswap's `Hooks
 
 ```solidity
 uint160 internal constant BIT_CHECK_MASK = Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG | Hooks.AFTER_REMOVE_LIQUIDITY_FLAG
-    | Hooks.AFTER_REMOVE_LIQUIDITY_RETURNS_DELTA_FLAG | Hooks.AFTER_ADD_LIQUIDITY_RETURNS_DELTA_FLAG;
+    | Hooks.AFTER_REMOVE_LIQUIDITY_RETURNS_DELTA_FLAG | Hooks.AFTER_ADD_LIQUIDITY_RETURNS_DELTA_FLAG
+    | Hooks.BEFORE_ADD_LIQUIDITY_FLAG;
 ```
 
 | Flag in the mask | Bit | Why it fails the check |
@@ -420,18 +421,19 @@ uint160 internal constant BIT_CHECK_MASK = Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG | 
 | `AFTER_REMOVE_LIQUIDITY_FLAG` | 8 | The hook runs after a removal and can make it revert. |
 | `AFTER_REMOVE_LIQUIDITY_RETURNS_DELTA_FLAG` | 0 | The hook can take a cut of what a removal pays out. |
 | `AFTER_ADD_LIQUIDITY_RETURNS_DELTA_FLAG` | 1 | The hook can bill whoever adds liquidity, which would take a borrower's tokens in `mintAndDeposit` and `increaseLiquidity` without adding to the collateral. |
+| `BEFORE_ADD_LIQUIDITY_FLAG` | 11 | The hook runs before an addition and can swap its own pool first, so the borrower adds liquidity in `mintAndDeposit` and `increaseLiquidity` at a price the hook chose. |
 
 ```solidity
 function passesBitCheck(IHooks hooks) internal pure returns (bool)
 function returnsRemoveLiquidityDelta(IHooks hooks) internal pure returns (bool)
 ```
 
-- `passesBitCheck` is true when the hook address has none of the four flags. A pool with no hook (`address(0)`) passes.
+- `passesBitCheck` is true when the hook address has none of the five flags. A pool with no hook (`address(0)`) passes.
 - `returnsRemoveLiquidityDelta` is true when the address has both `AFTER_REMOVE_LIQUIDITY_FLAG` and `AFTER_REMOVE_LIQUIDITY_RETURNS_DELTA_FLAG`. It decides whether a removal haircut above zero is allowed.
 
 A hook that fails the check can still be accepted if the owner adds it to `hookAllowlist` after reviewing its code.
 
-Passing the check is not acceptance. The mask covers four permissions and not every way a hook can affect a position. Callbacks that run when liquidity is added, for example, pass the check as long as they return no delta. Every pool is reviewed and listed one by one for that reason. See [pool listing](../concepts/pool-listing.md).
+Passing the check is not acceptance. The mask covers five permissions and not every way a hook can affect a position. A hook that runs after liquidity is added, for example, passes the check as long as it returns no delta. Every pool is reviewed and listed one by one for that reason. See [pool listing](../concepts/pool-listing.md).
 
 ## Events
 
