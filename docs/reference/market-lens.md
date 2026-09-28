@@ -89,7 +89,7 @@ Returns 0 when the market does not hold the position, or when the debt is alread
 Example: a position worth $10,000 in a pool with a max LTV of 65%, with 2,000 USDG of debt and USDG at $1.00, returns 4,500 USDG.
 
 :::info[maxBorrow covers the LTV limit only]
-`maxBorrow` does not check anything else `borrow` checks. A borrow of that size can still revert because the market is paused, the pool is frozen, the USDG price is outside 0.97 to 1.03, the pool's spot price is more than 2% away from the oracle, a debt cap is reached, the resulting debt is under 10 USDG, or the market does not hold enough cash.
+`maxBorrow` does not check anything else `borrow` checks. A borrow of that size can still revert because the market is paused, the pool is closed to new borrowing (frozen, a token disabled, or its hook no longer permitted), the USDG price is outside 0.97 to 1.03, the pool's spot price is more than 2% away from the oracle, a debt cap is reached, the resulting debt is under 10 USDG, or the market does not hold enough cash.
 :::
 
 ### `healthFactor`

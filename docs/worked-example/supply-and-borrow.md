@@ -110,7 +110,7 @@ The 65% limit is not the only gate. `borrow` reverts if any of the following is 
 |---|---|
 | The market is paused | `EnforcedPause` |
 | The caller is not the depositor of the position | `BorrowerNotAuthorized` |
-| The pool is frozen | `PoolNotOpenForBorrowing` |
+| The pool is frozen, one of its tokens is disabled, or its hook is no longer permitted | `PoolNotOpenForBorrowing` |
 | The new debt would exceed max LTV | `BorrowExceedsMaxLtv` |
 | The position's total debt would be under the 10 USDG minimum | `BorrowBelowMinimum` |
 | The pool's debt would exceed that pool's debt cap | `PoolDebtCapExceeded` |

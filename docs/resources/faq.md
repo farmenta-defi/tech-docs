@@ -96,7 +96,7 @@ The revert reason names the gate that refused. See [Errors](../reference/errors.
 
 ### Can I add or remove liquidity while borrowing?
 
-Yes. `increaseLiquidity` adds to your position, as long as the pool is not frozen and your health factor is at least 1 afterwards. `decreaseLiquidity` removes part of it: what remains must stay above the pool's minimum position value, and your debt must still fit the borrowing limit of what remains, not only the liquidation threshold. See [Managing collateral](../concepts/managing-collateral.md).
+Yes. `increaseLiquidity` adds to your position, as long as the pool still takes new positions (it is not frozen, its tokens are enabled and its hook is permitted) and your health factor is at least 1 afterwards. `decreaseLiquidity` removes part of it: what remains must stay above the pool's minimum position value, and your debt must still fit the borrowing limit of what remains, not only the liquidation threshold. See [Managing collateral](../concepts/managing-collateral.md).
 
 ### Will I be liquidated if my position goes out of range?
 

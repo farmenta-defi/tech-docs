@@ -60,7 +60,7 @@ struct TokenConfig {
 
 | Field | Meaning |
 |---|---|
-| `enabled` | Whether the token can appear in newly accepted collateral. |
+| `enabled` | Whether the token can appear in new listings, in newly accepted collateral and behind new borrowing. |
 | `tier` | The risk class of the token. |
 | `decimals` | The token's decimals, recorded by the owner. They are never read live from the token, because a token that could change its reported decimals could change the value of every position. Native ETH is recorded as 18. |
 | `priceFeed` | The Chainlink feed for the token's USD price. Required for an enabled Blue-chip token. Meme tokens are priced through the TWAP recorder and have no feed. |
@@ -189,7 +189,7 @@ Writes the whole configuration of a token, replacing what was there.
 
 Emits `TokenConfigured(currency, enabled, tier, decimals, priceFeed)`.
 
-Disabling a token does not unlist or freeze the pools that contain it. It stops new deposits and liquidity additions for those pools, because the token is checked again at deposit time. Existing positions keep using the recorded decimals and price source. Winding a pool down is a per pool decision: freeze it, and ramp its threshold if needed.
+Disabling a token does not unlist or freeze the pools that contain it. It stops new deposits, liquidity additions and new borrowing for those pools, because the token is checked again each time. Enabling the token again reopens them on the listing they had. Existing positions keep using the recorded decimals and price source. Winding a pool down is a per pool decision: freeze it, and ramp its threshold if needed.
 
 ### `setHookAllowlist`
 
@@ -199,7 +199,7 @@ function setHookAllowlist(address hooks, bool allowed) external onlyOwner
 
 Allows or disallows a hook that does not pass the permission check. Emits `HookAllowlisted(hooks, allowed)`.
 
-Removing a hook from the allowlist stops new deposits and liquidity additions for its pools. It does not touch existing positions.
+Removing a hook from the allowlist stops new deposits, liquidity additions and new borrowing for its pools. Allowing the hook again reopens them on the listing they had. It does not touch existing positions.
 
 ### `list`
 
@@ -208,6 +208,8 @@ function list(PoolKey calldata key, ListingParams calldata params) external only
 ```
 
 Lists a pool on the given terms. The tier is derived from the pool's tokens, so a Meme pair cannot be listed on Blue-chip terms by mistake. A pool is never listed frozen, and it starts with no ramp.
+
+The policy records the pool's two currencies and its hook with the listing. A pool id cannot be turned back into its key, and `acceptsNewPositions` is asked about a pool by its id. The record is written once and has no setter.
 
 | Check | Error |
 |---|---|
@@ -334,7 +336,9 @@ function revokeHook(address hooks) external
 
 Takes a hook off the allowlist, exactly as `setHookAllowlist(hooks, false)` does. Emits `HookAllowlisted(hooks, false)`. A hook that passes the permission check without the allowlist is not stopped by this.
 
-`disableToken` and `revokeHook` close `checkPool`, which deposits, `mintAndDeposit` and `increaseLiquidity` go through. `borrow` asks `acceptsNewPositions`, which reads the listing only, so a loan can still be drawn against collateral the market already holds until the pool is frozen.
+`disableToken` and `revokeHook` close `checkPool`, which deposits, `mintAndDeposit` and `increaseLiquidity` go through, and `acceptsNewPositions`, which `borrow` asks. One call reaches every pool that holds the token or sits behind the hook: those pools take no new collateral and no new borrowing, and none of them has to be frozen for it. When the owner enables the token or allows the hook again, they reopen on the listing they had.
+
+A pool behind a hook that passes the permission check never needed the allowlist. Revoking that hook stops nothing, and such a pool is stopped with `freeze`.
 
 ## Views
 
@@ -375,7 +379,18 @@ The two rules that need the position itself, liquidity above zero and the minimu
 function acceptsNewPositions(PoolId poolId) external view returns (bool)
 ```
 
-`true` when the pool is listed and not frozen. `borrow` uses this check.
+`true` when all four of these hold. `borrow` uses this check.
+
+| Condition | Read from |
+|---|---|
+| The pool is listed | `listingOf(poolId).listed` |
+| The pool is not frozen | `listingOf(poolId).frozen` |
+| Both tokens of the pool are enabled | `tokenConfig(currency).enabled` |
+| The hook passes the permission check or is allowlisted | The hook's address, and `hookAllowlist(hooks)` |
+
+The tokens and the hook are the ones recorded when the pool was listed. The answer agrees with `checkPool` asked by a market of the pool's tier, so a pool is open to borrowing exactly when it is open to a deposit.
+
+The function answers `false` without a reason. The four reads in the table tell which condition closed the pool.
 
 ### `listingOf`
 

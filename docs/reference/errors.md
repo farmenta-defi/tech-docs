@@ -61,7 +61,7 @@ Collateral admission, `mintAndDeposit` and `increaseLiquidity`.
 | `InvalidBorrowRecipient(address to)` | `borrow`: `to` is the zero address or the market. | Pass the address that should receive the USDG. |
 | `ZeroBorrowAmount()` | `borrow` was called with an amount of zero. | Pass an amount above zero. |
 | `BorrowerNotAuthorized(uint256 tokenId, address borrower)` | `borrow`: the caller is not the address the position is recorded to. | Call from the recorded address. |
-| `PoolNotOpenForBorrowing(PoolId poolId)` | `borrow`: the pool is frozen. | You cannot borrow more against this pool. Repaying, collecting fees, removing liquidity and withdrawing still work. |
+| `PoolNotOpenForBorrowing(PoolId poolId)` | `borrow`: the pool is frozen, one of its tokens is disabled, or its hook is no longer permitted. | You cannot borrow more against this pool. Repaying, collecting fees, removing liquidity and withdrawing still work. |
 | `UsdgPriceOutOfBounds(uint256 price)` | The USDG price is below 0.97 or above 1.03. Actions that take value out of a position with debt are stopped. | Wait until USDG is back inside the range. Repaying is not affected. |
 | `SpotPriceDeviation(uint256 deviationBps, uint256 maximumDeviationBps)` | Blue-chip market: the pool's spot price is more than 200 basis points away from the oracle price. | Wait until the pool and the oracle agree again. This gate protects against a manipulated pool. |
 | `BorrowExceedsMaxLtv(uint256 requestedDebt, uint256 maximumDebt)` | `borrow`: the debt after the borrow would be above collateral value times max LTV. Both arguments are in USD scaled by 1e18. | Borrow less. Read `maxBorrow` on the lens first. |
@@ -127,9 +127,9 @@ Errors a user can meet through the market:
 | `PoolNotListed(PoolId poolId)` | The pool has never been listed. | Positions of this pool are not accepted. See [pool listing](../concepts/pool-listing.md). |
 | `PoolFrozenForNewPositions(PoolId poolId)` | The pool is frozen. It takes no new collateral and no added liquidity. | Existing positions can still repay, collect fees, remove liquidity and withdraw. |
 | `WrongTier(Tier poolTier, Tier marketTier)` | The pool belongs to the other market. | Use the market of the pool's tier: `1` is Blue-chip, `2` is Meme. |
-| `TokenNotEnabled(Currency currency)` | One of the pool's tokens is disabled. | New deposits for pools with this token are closed. |
+| `TokenNotEnabled(Currency currency)` | One of the pool's tokens is disabled. | New deposits and added liquidity for pools with this token are closed. Borrowing against them is closed too, with `PoolNotOpenForBorrowing`. |
 | `PairMustQuoteInUsdg()` | Neither token of the pool is USDG. | Only pools quoted in USDG are accepted. |
-| `HookNotPermitted(address hooks)` | The pool's hook fails the permission check and is not allowlisted. | Pools with this hook are not accepted. |
+| `HookNotPermitted(address hooks)` | The pool's hook fails the permission check and is not allowlisted. | Pools with this hook are not accepted. Borrowing against positions already held in them is closed too, with `PoolNotOpenForBorrowing`. |
 
 Errors only the owner can meet:
 

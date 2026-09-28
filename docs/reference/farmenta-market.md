@@ -50,7 +50,7 @@ IInterestRateModel public immutable interestRateModel;
 Two switches can stop part of a market, and they are different things.
 
 - **Paused** is a switch on the whole market, set by the market owner with `pause`. It stops everything that adds risk or depends on an oracle price.
-- **Frozen** is a switch on one pool, set in `CollateralPolicy` with `setFrozen`. It stops new collateral, new borrowing and added liquidity for that pool only.
+- **Frozen** is a switch on one pool, set in `CollateralPolicy` with `setFrozen`. It stops new collateral, new borrowing and added liquidity for that pool only. A pool is closed in the same way while one of its tokens is disabled or its hook is off the allowlist.
 
 In both states interest keeps accruing, and borrowers can always repay and take back collateral that has no debt.
 
@@ -70,7 +70,7 @@ In both states interest keeps accruing, and borrowers can always repay and take 
 | `withdrawReserves`, `rescueUnaccountedToken`, `rescueUnaccountedEth` | Works | Works |
 | `scheduleUpgrade`, `cancelUpgrade`, `upgradeToAndCall` | Works | Works (not tied to a pool) |
 
-A call that is stopped by the pause reverts with `EnforcedPause()`. A call that is stopped by a freeze reverts with `PoolFrozenForNewPositions(poolId)` on the collateral side and `PoolNotOpenForBorrowing(poolId)` on `borrow`.
+A call that is stopped by the pause reverts with `EnforcedPause()`. A call that is stopped by a freeze reverts with `PoolFrozenForNewPositions(poolId)` on the collateral side and `PoolNotOpenForBorrowing(poolId)` on `borrow`. In a pool closed by a token or by its hook, the collateral side reverts with `TokenNotEnabled(currency)` or `HookNotPermitted(hooks)`, and `borrow` with the same `PoolNotOpenForBorrowing(poolId)`.
 
 :::warning[Liquidation stops while the market is paused]
 `liquidate` is paused together with borrowing. If prices keep falling during a pause, positions can go deeper under water and end as bad debt. See [pause and emergency](../risk/pause-and-emergency.md).
@@ -486,7 +486,7 @@ Checks, in order:
 | `to` is not the zero address and not the market | `InvalidBorrowRecipient(to)` |
 | `amount` is not zero | `ZeroBorrowAmount()` |
 | The caller is the recorded owner | `BorrowerNotAuthorized(tokenId, borrower)` |
-| The pool is listed and not frozen | `PoolNotOpenForBorrowing(poolId)` |
+| The pool is listed and not frozen, both of its tokens are enabled, and its hook is permitted | `PoolNotOpenForBorrowing(poolId)` |
 | The USDG price is within 0.97 to 1.03 | `UsdgPriceOutOfBounds(price)` |
 | Blue-chip only: the pool's spot price is within 200 basis points of the oracle price | `SpotPriceDeviation(deviationBps, maximumDeviationBps)` |
 | Debt after the borrow, in USD, is at most collateral value times max LTV | `BorrowExceedsMaxLtv(requestedDebt, maximumDebt)` |

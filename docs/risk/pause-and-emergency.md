@@ -79,6 +79,8 @@ A pause has no maximum duration, and each market is paused on its own. The guard
 
 A pause covers a whole market. A freeze covers one pool and has no effect on the vault or on other pools. Both can be active at the same time, and then the stricter column applies.
 
+The "Pool frozen" column also describes a pool that is closed for another reason: one of its tokens is disabled, or its hook was taken off the allowlist. The same actions stop and the same actions stay open. The difference is the reach. Disabling a token closes every pool that holds it, and the pool's own `frozen` flag stays as it was.
+
 A frozen pool is often combined with a falling liquidation threshold. The owner can schedule an [LT ramp](./admin-powers.md#how-terms-are-tightened) or lower LT in one step, and liquidations run throughout. Freezing a pool is not a grace period for borrowers.
 
 ## How to tell which state you are in
@@ -86,10 +88,12 @@ A frozen pool is often combined with a falling liquidation threshold. The owner 
 | Check | Where |
 |---|---|
 | Is the market paused? | `paused()` on the market. The market emits `Paused` and `Unpaused`. |
-| Is my pool frozen? | `acceptsNewPositions(poolId)` or `listingOf(poolId)` on the [`CollateralPolicy`](../reference/collateral-policy.md). The policy emits `PoolFrozen`. |
+| Does my pool take new collateral and new borrowing? | `acceptsNewPositions(poolId)` on the [`CollateralPolicy`](../reference/collateral-policy.md). |
+| Is my pool frozen? | `listingOf(poolId)` shows the `frozen` flag. The policy emits `PoolFrozen`. |
+| Is a token of my pool disabled, or its hook off the allowlist? | `tokenConfig(currency)` and `hookAllowlist(hooks)`. The policy emits `TokenConfigured` and `HookAllowlisted`. |
 | Is an LT ramp running? | `listingOf(poolId)` shows the start value, target, start time and duration. `effectiveLt(poolId)` gives the LT in force now. |
 
-A call that is stopped by a pause reverts with `EnforcedPause`. A deposit or an addition to a frozen pool reverts with `PoolFrozenForNewPositions`, and a borrow with `PoolNotOpenForBorrowing`. See [Errors](../reference/errors.md).
+A call that is stopped by a pause reverts with `EnforcedPause`. A deposit or an addition to a frozen pool reverts with `PoolFrozenForNewPositions`. In a pool closed by a token or by its hook it reverts with `TokenNotEnabled` or `HookNotPermitted`. A borrow reverts with `PoolNotOpenForBorrowing` in all three cases. See [Errors](../reference/errors.md).
 
 ## What to do
 

@@ -44,14 +44,14 @@ The guardian is one account the owner names, on each market and on the policy. I
 |---|---|---|---|
 | `FarmentaMarket` | `pause()` | Every action that takes on new risk stops, liquidation included | `unpause()` |
 | `CollateralPolicy` | `freeze(poolId)` | The pool takes no new collateral and no new borrowing | `setFrozen(poolId, false)` |
-| `CollateralPolicy` | `disableToken(currency)` | The token is refused in new collateral and in new listings | `setTokenConfig` with `enabled = true` |
-| `CollateralPolicy` | `revokeHook(hooks)` | Pools behind the hook take no new positions | `setHookAllowlist(hooks, true)` |
+| `CollateralPolicy` | `disableToken(currency)` | The token is refused in new listings, and every pool that holds it takes no new collateral and no new borrowing | `setTokenConfig` with `enabled = true` |
+| `CollateralPolicy` | `revokeHook(hooks)` | Pools behind the hook take no new collateral and no new borrowing, unless the hook passes the permission check on its own | `setHookAllowlist(hooks, true)` |
 
 A small example: on Monday at 10:00 a token of a listed pool turns out to be compromised. The guardian freezes the pool at 10:05, and from that block the pool takes no new collateral and no new loan. Reopening the pool is an owner call: scheduled on Monday, it can run on Wednesday.
 
 What the guardian cannot do: reverse any of the four, change a pool's terms, LT, haircut or debt cap, list a pool, withdraw reserves, rescue assets, schedule or install an upgrade, move ownership, or name the next guardian. It cannot move anyone's assets.
 
-`freeze`, `disableToken` and `revokeHook` leave existing loans as they were: `repay`, `withdrawCollateral`, `collectFees`, `decreaseLiquidity` and `liquidate` keep working, and a disabled token is still priced. `disableToken` and `revokeHook` close the way in for positions. They do not stop `borrow` against collateral the market already holds. `freeze` does, pool by pool.
+`freeze`, `disableToken` and `revokeHook` leave existing loans as they were: `repay`, `withdrawCollateral`, `collectFees`, `decreaseLiquidity` and `liquidate` keep working, and a disabled token is still priced. `disableToken` and `revokeHook` reach every pool of that token or behind that hook in one call. They close the way in for positions, and they stop `borrow` against collateral the market already holds, with no freeze of each pool. When the owner enables the token or allows the hook again, those pools reopen on the listing they had. One case is different: a hook that passes the permission check never needed the allowlist, so revoking it stops nothing, and such a pool is stopped with `freeze`.
 
 :::warning[A pause stops liquidations too]
 A pause made in error, or by a guardian key that was stolen, holds liquidations back for as long as it lasts, and prices that move in that time can turn into bad debt. Only the owner can lift a pause. To keep a pause short, the owner's procedure is to keep one `unpause` call per market waiting in its queue. Scheduled ahead of time, that call is ready two days later and stays ready, so the owner can lift a pause in one transaction. Once it is used, the next one is scheduled and waits two days again.
