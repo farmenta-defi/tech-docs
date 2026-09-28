@@ -197,16 +197,22 @@ The opposite error hurts lenders: a haircut below the hook's real cut means liqu
 
 ## The team's liquidation keeper
 
-The team plans to operate its own liquidation keeper and a recording service for Meme pools. Neither is running yet. The rules below are the rules they are committed to follow once they run. You should know three things about the liquidation keeper:
+The team plans to operate its own liquidation keeper and a recording service for Meme pools. Neither is running yet. The rules below are the rules they are committed to follow once they run. You should know four things about the liquidation keeper:
 
-- **It will compete with public liquidators.** Outside the case below, it executes as soon as a position reads `HF < 1`.
+- **It will compete with public liquidators.** Outside the two cases below, it executes as soon as a position reads `HF < 1`.
 - **Its profit will go to the team treasury.**
-- **It follows a waiting rule during LT ramps.** Lowering LT can make loans liquidatable, and the team's keeper could then earn the bonus. The rule below is there to let public liquidators go first.
+- **It follows a waiting rule during LT ramps.** Lowering LT can make loans liquidatable, and the team's keeper could then earn the bonus. The rule is there to let public liquidators go first.
+- **It follows the same waiting rule on a stale Meme pool.** The team also runs the recording service, and a Meme pool that gets no observations is valued in stale mode, which makes its loans easier to liquidate. The rule is there so that a gap in recording does not turn into a gain for the team's keeper.
 
-The rule: while an LT ramp is running on a pool, it waits 60 seconds after it first reads `HF < 1` before it executes a position in that pool, so that public liquidators can go first.
+The two rules:
+
+- While an LT ramp is running on a pool, the keeper waits 60 seconds after it first reads `HF < 1` before it executes a position in that pool.
+- When a Meme pool is in stale mode, the keeper first calls `record` for that pool, then waits 60 seconds after it first reads `HF < 1` before it executes a Meme position in that pool. The wait stays in force for that loan even when the pool is fresh again before the 60 seconds are over.
+
+In both cases the keeper executes after the wait only if the position is still liquidatable.
 
 :::warning[The 60 second wait is a keeper rule, not a contract rule]
-Nothing on-chain enforces the wait. It applies only while the ramp is running. Once the ramp has finished, LT stays at its target and the keeper competes directly again. A one-step change through `updateTerms` has no ramp and therefore no keeper wait.
+Nothing on-chain enforces either wait, and public liquidators are not bound by them. The ramp wait applies only while the ramp is running. Once the ramp has finished, LT stays at its target and the keeper competes directly again. A one-step change through `updateTerms` has no ramp and therefore no keeper wait.
 :::
 
 The same team will also run the service that records price observations for Meme pools. Until that service runs, a Meme pool gets observations only from market transactions and from anyone who calls `record`, so a quiet pool enters stale mode after 900 seconds. When no observation arrives for more than 900 seconds, Meme positions are valued in [stale mode](./oracle-and-market-risks.md#stale-mode), which makes them easier to liquidate. Recording is permissionless: anyone, including a borrower, can call `record` on the [`TwapRecorder`](../reference/twap-recorder.md) to end stale mode.
