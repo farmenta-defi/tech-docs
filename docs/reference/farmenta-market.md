@@ -721,7 +721,7 @@ On a full seizure `out0` and `out1` are the balance change of `to` across the pa
 Every function in this section is restricted to the market owner and reverts with `OwnableUnauthorizedAccount(account)` for anyone else.
 
 :::info[Owner powers]
-The owner can pause the market and upgrade the contract through a timelock. What each power means for users is described in [owner powers](../risk/admin-powers.md).
+The owner is a `TimelockController`, so every call in this section is scheduled on-chain and runs 2 days later at the earliest. An upgrade also waits in the market's own upgrade timelock. What each power means for users is described in [owner powers](../risk/admin-powers.md).
 :::
 
 ### `pause` and `unpause`
@@ -812,7 +812,7 @@ One upgrade waits at a time. No sequence of calls brings an `eta` forward: cance
 function cancelUpgrade() external onlyOwner
 ```
 
-Withdraws the scheduled upgrade, at once. Reverts with `NoUpgradeScheduled()` when nothing is scheduled. Emits `UpgradeCancelled(newImplementation)`.
+Withdraws the scheduled upgrade when it runs. Reverts with `NoUpgradeScheduled()` when nothing is scheduled. Emits `UpgradeCancelled(newImplementation)`.
 
 ### `upgradeToAndCall`
 

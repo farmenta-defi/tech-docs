@@ -144,15 +144,15 @@ Not yet. The contracts are tested with unit tests, tests against a fork of the l
 
 ### Who controls the contracts?
 
-The owner account. It can upgrade the market contract, pause markets, list and freeze pools, change pool terms within the tier presets, and withdraw reserves above the floor. An upgrade has to be scheduled on-chain first and can be installed only two days later. See [Owner powers and upgradeability](../risk/admin-powers.md).
+The owner, which is a timelock contract. It can upgrade the market contract, pause markets, list and freeze pools, change pool terms within the tier presets, and withdraw reserves above the floor. Every one of those calls is scheduled on-chain first and runs two days later at the earliest. An upgrade waits a second time in the market itself, about four days in total. See [Owner powers and upgradeability](../risk/admin-powers.md).
 
 ### Can the owner take my collateral or my USDG?
 
-No owner function moves a recorded collateral NFT or lender funds. The market is an upgradeable contract, and an upgrade can change its rules, so upgradeability is a trust assumption of the protocol. Every upgrade waits out a two day timelock, which gives you time to repay, withdraw your collateral or redeem your shares first. See [Owner powers and upgradeability](../risk/admin-powers.md).
+No owner function moves a recorded collateral NFT or lender funds. The market is an upgradeable contract, and an upgrade can change its rules, so upgradeability is a trust assumption of the protocol. Every upgrade waits about four days, two in the owner's queue and two in the market's upgrade timelock, which gives you time to repay, withdraw your collateral or redeem your shares first. See [Owner powers and upgradeability](../risk/admin-powers.md).
 
 ### Can the owner change the terms of my loan?
 
-Yes. The owner can lower your pool's liquidation threshold, raise its liquidator bonus, or raise the removal haircut of a frozen pool, and the change applies to existing loans at once. Terms can never be looser than the tier presets, and a scheduled ramp is visible on-chain before it takes effect. See [Owner powers and upgradeability](../risk/admin-powers.md).
+Yes. The owner can lower your pool's liquidation threshold, raise its liquidator bonus, or raise the removal haircut of a frozen pool, and the change applies to existing loans. Every such change waits two days in the owner's queue, where you can see it before it applies. Terms can never be looser than the tier presets, and a scheduled ramp is visible on-chain before it takes effect. See [Owner powers and upgradeability](../risk/admin-powers.md).
 
 ### What happens if the market is paused?
 

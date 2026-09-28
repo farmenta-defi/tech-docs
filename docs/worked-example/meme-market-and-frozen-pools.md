@@ -74,7 +74,7 @@ The two markets are separate contracts with separate cash, debt, reserves and sh
 
 ## When a pool is frozen or its LT is lowered
 
-The owner can freeze Budi's ETH/USDG pool with `setFrozen`, and can lower its liquidation threshold either at once with `updateTerms` or gradually with a scheduled LT ramp (`scheduleLtRamp`). These tools exist so the protocol can step away from a pool that has gone bad.
+The owner can freeze Budi's ETH/USDG pool with `setFrozen`, and can lower its liquidation threshold either in one step with `updateTerms` or gradually with a scheduled LT ramp (`scheduleLtRamp`). These tools exist so the protocol can step away from a pool that has gone bad. Each of these calls waits two days in the owner's queue before it runs.
 
 ### What stops and what continues
 
@@ -96,7 +96,7 @@ Go back to the end of T3. Budi's position is still worth $20,300 and his debt ha
 HF at LT 75% = $20,300 × 75% / $12,300          = 1.238
 ```
 
-Now the owner freezes the pool and lowers its LT to 60%. The new threshold applies to existing loans immediately:
+Now the owner freezes the pool and lowers its LT to 60%. Both calls were scheduled two days earlier. When they run, the new threshold applies to existing loans:
 
 ```text
 HF at LT 60% = $20,300 × 60% / $12,300          = 0.990     below 1, can be liquidated
@@ -105,12 +105,12 @@ HF at LT 60% = $20,300 × 60% / $12,300          = 0.990     below 1, can be liq
 Nothing about Budi's position changed. The price did not move and he took no action. Only the rule changed.
 
 :::warning[A change of terms can make a healthy loan liquidatable]
-Lowering LT applies at once to loans that already exist. Budi becomes liquidatable and pays the liquidator's bonus **without having done anything wrong**. There is no rate limit and no lower bound on how far or how fast the owner can tighten a pool. See [admin powers](../risk/admin-powers.md).
+Lowering LT applies to loans that already exist. If Budi does not act during the two days the change waits in the owner's queue, he becomes liquidatable and pays the liquidator's bonus without any move in price. There is no lower bound on how far the owner can tighten a pool. See [admin powers](../risk/admin-powers.md).
 :::
 
 ### What protects the borrower
 
-One thing: visibility. When the change is made through an LT ramp, the schedule is stored on-chain. The threshold falls in a straight line from its current value to the target between the start time and the end time, and anyone can read it.
+One thing: visibility. Every change of terms waits two days in the owner's queue, where anyone can read it. When the change is made through an LT ramp, the schedule is stored on-chain as well. The threshold falls in a straight line from its current value to the target between the start time and the end time, and anyone can read it.
 
 ```solidity
 // The liquidation threshold in force right now, resolved through any ramp
@@ -120,14 +120,14 @@ policy.effectiveLt(poolId);
 policy.listingOf(poolId);
 ```
 
-So Budi can see when his position will cross `HF = 1` and repay part of his debt before that moment. A direct `updateTerms` gives no such notice.
+So Budi can see when his position will cross `HF = 1` and repay part of his debt before that moment. A direct `updateTerms` has no ramp: its only notice is the two days in the owner's queue.
 
 Two further rules limit the damage:
 
 - LT can be lowered to or below max LTV only while the pool is frozen. An open pool always keeps room between the two, so no new loan is handed out already liquidatable. In the example, 60% is under the 65% max LTV, which is why the pool had to be frozen first.
 - A ramp can only go down. It starts from the threshold in force at that moment, so a second ramp cannot raise the LT again.
 
-If you borrow against a pool, watch for its `PoolFrozen`, `PoolTermsUpdated` and `LtRampScheduled` events. See [pool listing](../concepts/pool-listing.md) for the listing lifecycle and the [CollateralPolicy reference](../reference/collateral-policy.md).
+If you borrow against a pool, watch the timelock's `CallScheduled` event for calls to the policy, and the pool's `PoolFrozen`, `PoolTermsUpdated` and `LtRampScheduled` events. See [pool listing](../concepts/pool-listing.md) for the listing lifecycle and the [CollateralPolicy reference](../reference/collateral-policy.md).
 
 ## Notes on rounding and simplification
 

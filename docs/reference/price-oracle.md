@@ -192,7 +192,7 @@ The meme path has no source outside the pool. The spot price is whatever the poo
 
 ## What the oracle does not do
 
-- It does not check whether the sequencer is up. Robinhood Chain has no sequencer uptime feed. The mitigation is the owner pausing the market, see [pause and emergency](../risk/pause-and-emergency.md).
+- It does not check whether the sequencer is up. Robinhood Chain has no sequencer uptime feed. The mitigation is the owner pausing the market, which takes effect two days after it is scheduled, see [pause and emergency](../risk/pause-and-emergency.md).
 - It does not compare Chainlink with a second price provider. The second check on the Blue-chip side is the pool's own spot price, through the 2% gate.
 - It does not store prices. Every call reads the feed or the pool again.
 

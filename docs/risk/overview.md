@@ -11,7 +11,7 @@ Farmenta works like a pawnshop that accepts an item whose price moves every seco
 This section lists those dependencies, who carries each risk, and what limits it. Read it before you supply USDG, deposit a position, or run a liquidation bot.
 
 :::info[Security status]
-Farmenta's contracts are open source and are not deployed yet. They have not been audited yet. The market contract is upgradeable and administered by the owner account. Every upgrade is scheduled on-chain first and can be installed only two days later. See [Owner powers and upgradeability](./admin-powers.md).
+Farmenta's contracts are open source and are not deployed yet. They have not been audited yet. The market contract is upgradeable, and its owner is a timelock contract: every owner call is scheduled on-chain and runs two days later at the earliest, and an upgrade about four days later. See [Owner powers and upgradeability](./admin-powers.md).
 :::
 
 ## A small example
@@ -29,21 +29,21 @@ Three different things can push that number below 1 and make the loan liquidatab
 - **Time passes.** Interest is added to the debt every second. With no price change at all, the debt eventually grows until `HF < 1`.
 - **The pool's terms change.** If the owner lowers the pool's LT, the same position and the same debt give a lower HF.
 
-The first two are the ordinary risks of any collateralized loan. The third exists so that the owner can react quickly to a broken price feed or a failing token, and it is described on the [owner powers](./admin-powers.md) page.
+The first two are the ordinary risks of any collateralized loan. The third exists so that the protocol can step away from a broken price feed or a failing token. It is visible on-chain two days before it applies, and it is described on the [owner powers](./admin-powers.md) page.
 
 ## Summary of the main risks
 
 | Risk | Who bears it | What limits it | Details |
 |---|---|---|---|
 | **Smart contract risk.** As in any protocol, a bug can lose or lock funds. | Everyone | Open source code, unit tests, tests against a fork of the live chain, and invariant tests. An audit has not been completed yet. | [Contract architecture](../reference/architecture.md) |
-| **Upgradeability.** The market is an upgradeable contract administered by the owner account. An upgrade can change any rule of the market, including how collateral and funds are held. | Everyone | No owner function moves recorded collateral or lender funds. Every upgrade is scheduled on-chain first and can be installed only after a two day timelock, which gives users time to exit. | [Owner powers](./admin-powers.md) |
-| **Pool terms can be tightened.** The owner can lower a pool's LT, which lowers the health factor of existing loans in that pool. | Borrowers | Terms can never be looser than the tier presets. A scheduled LT ramp is stored on-chain, so borrowers can see it coming. | [Owner powers](./admin-powers.md) |
+| **Upgradeability.** The market is an upgradeable contract administered by the owner. An upgrade can change any rule of the market, including how collateral and funds are held. | Everyone | No owner function moves recorded collateral or lender funds. Every upgrade waits two days in the owner's queue and two more days in the market's upgrade timelock, about four days in total, which gives users time to exit. | [Owner powers](./admin-powers.md) |
+| **Pool terms can be tightened.** The owner can lower a pool's LT, which lowers the health factor of existing loans in that pool. | Borrowers | Terms can never be looser than the tier presets. Every change waits two days in the owner's queue, and a scheduled LT ramp is stored on-chain, so borrowers can see it coming. | [Owner powers](./admin-powers.md) |
 | **Oracle risk.** Chainlink is the only price source for ETH and USDG. The ETH/USD feed has a 24 hour heartbeat. | Borrowers and lenders | Prices older than 25 hours are rejected. Inside that window a lagging price is held only by the 2% spot gate on borrowing. | [Oracle, market and chain risks](./oracle-and-market-risks.md) |
 | **Meme token price manipulation and rug risk.** A thin pool can be pushed, and a token can lose nearly all its value. | Meme market borrowers and lenders | Low max LTV (30%) and LT (40%), small debt caps, `min(spot, TWAP)` at borrow, pool by pool listing. Meme pools are not listed with real funds until a guard against single-transaction price pushes is in place. | [Oracle, market and chain risks](./oracle-and-market-risks.md) |
 | **Bad debt is socialized to lenders.** When collateral no longer covers a debt, the reserve absorbs the loss first and lenders of that market absorb the rest. | Lenders of the affected market | Conservative LTV and LT, debt caps, the reserve, and full isolation between the two markets. | [Bad debt](../concepts/bad-debt.md) |
 | **Liquidity risk for lenders.** Withdrawals are limited by the cash in the market. At high utilization you may have to wait. | Lenders | An interest curve that rises steeply above the kink to attract deposits and repayments. | [Oracle, market and chain risks](./oracle-and-market-risks.md) |
 | **USDG issuer powers.** The issuer can freeze addresses and pause the token. A pause halts repay, liquidate and withdrawals while it lasts. | Everyone | None in Farmenta's code. This is an external dependency. | [Oracle, market and chain risks](./oracle-and-market-risks.md) |
-| **Chain risk.** Robinhood Chain is an early stage rollup with a single sequencer, and it has no sequencer uptime feed. | Everyone | The owner can pause the market by hand. Pausing also stops liquidations. | [Pause and emergency behaviour](./pause-and-emergency.md) |
+| **Chain risk.** Robinhood Chain is an early stage rollup with a single sequencer, and it has no sequencer uptime feed. | Everyone | The owner can pause the market. A pause waits two days in the owner's queue, so it does not cover a short outage. Pausing also stops liquidations. | [Pause and emergency behaviour](./pause-and-emergency.md) |
 | **Third party hooks.** A pool's hook that is upgradeable can change its behaviour after the pool was reviewed. | Borrowers and lenders in that pool | On-chain permission check of the hook address, manual review before listing, and the ability to freeze the pool. | [Oracle, market and chain risks](./oracle-and-market-risks.md) |
 | **Liquidation risk.** When `HF < 1`, part or all of your position is sold to a liquidator at a discount. | Borrowers | A gap between max LTV and LT, partial liquidation in the Blue-chip market, and your own monitoring. | [Liquidations](../liquidations/overview.md) |
 
@@ -67,7 +67,7 @@ What you can do: read each pool's terms and debt cap before you supply, watch ut
 Your position stays in its Uniswap pool and keeps earning fees, but the market holds the NFT until your debt is zero. Your risks:
 
 1. **Liquidation.** Below `HF = 1`, a liquidator repays part of your debt and receives a slice of your liquidity worth that amount plus a bonus (5% in Blue-chip, 10% in Meme, or more if the pool's listing says so). In the Meme market, and in the Blue-chip market when `HF < 0.9` or the debt is under 100 USDG, the whole debt can be closed at once.
-2. **Terms that change under you.** The owner can lower LT, raise the liquidator bonus, or raise the removal haircut of a frozen pool. Each change applies to existing loans immediately.
+2. **Terms that change under you.** The owner can lower LT, raise the liquidator bonus, or raise the removal haircut of a frozen pool. Each change waits two days in the owner's queue, and then applies to existing loans.
 3. **Meme pricing modes.** In the Meme market your position can be valued at the pool's current price with a 20% cut when price observations stop arriving. A position that looks healthy on the time-weighted price can become liquidatable.
 4. **Custody.** Your NFT is held by the market contract until your debt is zero. See the [security status](#what-you-are-trusting) above.
 

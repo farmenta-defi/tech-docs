@@ -98,7 +98,7 @@ There are no setters for these. Pointing a market at a new policy, valuer, oracl
 The tier of a market (Blue-chip or Meme) is stored in proxy storage, not in an immutable, because one implementation serves both proxies. For the same reason `InterestRateModel` is one contract that carries both curves and takes the tier as an argument.
 
 :::info[Upgrades]
-Only the owner can authorize an upgrade of a market. The new implementation is scheduled with `scheduleUpgrade` and can be installed from `TIMELOCK_DELAY` (2 days) later, for `TIMELOCK_GRACE` (14 days), and only while the code at its address is the code that was scheduled. See [owner powers](../risk/admin-powers.md#the-upgrade-timelock).
+Only the owner can authorize an upgrade of a market. The new implementation is scheduled with `scheduleUpgrade` and can be installed from `TIMELOCK_DELAY` (2 days) later, for `TIMELOCK_GRACE` (14 days), and only while the code at its address is the code that was scheduled. The owner is a `TimelockController`, so the scheduling call itself waits 2 days first, and an upgrade takes about 4 days in total. See [owner powers](../risk/admin-powers.md#the-upgrade-timelock).
 :::
 
 ## Storage layout
@@ -217,6 +217,8 @@ The vault uses a decimals offset of 3. Shares carry three more decimals than USD
 | `FarmentaMarket` (each proxy) | `Ownable2StepUpgradeable`. The owner can pause, withdraw reserves above the floor, rescue unaccounted assets, and upgrade through the timelock. |
 | `CollateralPolicy` | `Ownable2Step`. The owner configures tokens, the hook allowlist, listings, freezes and LT ramps. |
 | `PriceOracle`, `TwapRecorder`, `PositionValuer`, `InterestRateModel`, `MarketLens`, `LiquidatorHelper` | No owner and no privileged function. |
+
+The owner of both markets and of the policy is a `TimelockController` with a delay of 2 days and no admin. Every owner call is scheduled in it by a proposer, waits the delay, and is run by an executor. See [owner powers](../risk/admin-powers.md).
 
 Ownership transfers are two step: the current owner nominates, and the new owner must accept.
 

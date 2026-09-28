@@ -8,7 +8,7 @@ sidebar_position: 4
 
 Picture a bank branch during a power cut. It stops handing out new loans, because it cannot check anything. It still lets you pay back what you owe and take your own belongings home.
 
-Farmenta has two switches that work in that spirit, both controlled by the owner:
+Farmenta has two switches that work in that spirit, both controlled by the owner. The owner is a timelock contract, so each switch is scheduled on-chain and takes effect two days later at the earliest. See [owner powers](./admin-powers.md).
 
 - **Pausing a market** stops every action in that market that adds risk or depends on a price. It is meant for moments when prices cannot be trusted, such as a sequencer outage or an oracle failure.
 - **Freezing a pool** stops new exposure to one pool only. It is how a pool is delisted. Everything that concerns existing loans keeps running, including liquidations.
@@ -19,7 +19,7 @@ Neither switch can stop you from repaying, from withdrawing collateral that has 
 
 Budi has a position worth $10,000 and a debt of 7,000 USDG in a pool with an LT of 75%. His health factor is `10,000 × 0.75 / 7,000 = 1.07`.
 
-The sequencer has trouble and the owner pauses the Blue-chip market. While the market is paused, ETH falls and Budi's position is worth $9,000. His health factor is now `9,000 × 0.75 / 7,000 = 0.96`.
+A pause of the Blue-chip market, scheduled two days earlier, takes effect. While the market is paused, ETH falls and Budi's position is worth $9,000. His health factor is now `9,000 × 0.75 / 7,000 = 0.96`.
 
 - Nobody can liquidate Budi while the pause lasts.
 - Budi can still repay. If he repays 1,000 USDG, his health factor becomes `9,000 × 0.75 / 6,000 = 1.13`.
@@ -55,7 +55,7 @@ Actions that only reduce risk, or that return an asset nobody has a claim on, ne
 This is an accepted risk. Prices can keep falling while the market is paused, and a loan that was only unhealthy when the pause began can be worth less than its debt when the market reopens. That shortfall is bad debt: it is taken from the reserve first and then from the lenders of that market.
 :::
 
-A pause has no maximum duration and no delay. The owner can pause and unpause at any time, and each market is paused on its own.
+A pause has no maximum duration, and each market is paused on its own. `pause` and `unpause` are owner calls, so each one waits two days in the owner's queue before it runs. A pause therefore does not cover a short outage, and a paused market reopens two days after the unpause is scheduled at the earliest. The queue is public: you can see a pause or an unpause coming with the timelock's `CallScheduled` event.
 
 ## Market paused compared with pool frozen
 
@@ -79,7 +79,7 @@ A pause has no maximum duration and no delay. The owner can pause and unpause at
 
 A pause covers a whole market. A freeze covers one pool and has no effect on the vault or on other pools. Both can be active at the same time, and then the stricter column applies.
 
-A frozen pool is often combined with a falling liquidation threshold. The owner can schedule an [LT ramp](./admin-powers.md#how-terms-are-tightened) or lower LT directly, and liquidations run throughout. Freezing a pool is not a grace period for borrowers.
+A frozen pool is often combined with a falling liquidation threshold. The owner can schedule an [LT ramp](./admin-powers.md#how-terms-are-tightened) or lower LT in one step, and liquidations run throughout. Freezing a pool is not a grace period for borrowers.
 
 ## How to tell which state you are in
 

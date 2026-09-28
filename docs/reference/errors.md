@@ -142,7 +142,7 @@ Errors only the owner can meet:
 | `HaircutRequiresRemoveDeltaHook()` | A removal haircut above zero was set for a pool whose hook cannot take a cut on removal. | Set the haircut to zero. |
 | `HaircutIncreaseRequiresFreeze()` | `updateTerms`: the removal haircut was raised on a pool that is not frozen. | Freeze the pool, update, then unfreeze. |
 | `RampStartInThePast()` | `scheduleLtRamp`: the start is before the current block timestamp. | Pass a start at or after the current time. |
-| `RampDurationIsZero()` | `scheduleLtRamp`: the duration is zero. | Pass a duration above zero. For an instant change use `updateTerms`. |
+| `RampDurationIsZero()` | `scheduleLtRamp`: the duration is zero. | Pass a duration above zero. For a change in one step use `updateTerms`. |
 | `RampBelowMaxLtvRequiresFreeze(uint16 maxLtvBps, uint16 ltTargetBps)` | `scheduleLtRamp`: the target is at or below max LTV and the pool is not frozen. | Freeze the pool first. |
 | `UnfreezeWouldLeaveNoBorrowingRoom(uint16 maxLtvBps, uint16 ltBps)` | `setFrozen`: the pool cannot be unfrozen because its threshold target is at or below max LTV. | Write terms with max LTV below the threshold first. |
 | `NoPresetForTier()` | Declared in `TierPresets`. The tier is `NONE`, which has no preset. | Configure the tier of the pool's tokens before listing. |

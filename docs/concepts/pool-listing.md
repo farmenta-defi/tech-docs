@@ -180,9 +180,9 @@ The idea behind the freeze rules: as long as a pool hands out new loans, max LTV
 ## Parameter changes apply to existing loans
 
 :::warning[Changes to a listing apply to existing loans]
-Changes to a listing apply immediately to loans that already exist. If the owner lowers LT, through a ramp or at once with `updateTerms`, or raises the removal haircut on a frozen pool, the health factor of every loan in that pool falls, and a loan close to its limit can become liquidatable.
+Changes to a listing apply to loans that already exist. Each change waits two days in the owner's queue before it runs. If the owner lowers LT, through a ramp or in one step with `updateTerms`, or raises the removal haircut on a frozen pool, the health factor of every loan in that pool falls, and a loan close to its limit can become liquidatable.
 
-A ramp publishes its schedule on-chain, so borrowers can see the change coming. Borrowing below the maximum leaves room for it.
+The owner's queue and a ramp's schedule are both on-chain, so borrowers can see the change coming. Borrowing below the maximum leaves room for it.
 
 Example: LT is lowered from 75% to 60% while a position is worth $20,300 and owes 12,300 USDG. The health factor drops from 1.238 to 0.990 and the position can be liquidated.
 

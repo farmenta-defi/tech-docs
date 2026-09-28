@@ -204,7 +204,7 @@ The risk class of a pool: Blue-chip or Meme. A pool takes the riskier tier of it
 
 ### Timelock
 
-The waiting period between the moment the owner schedules an upgrade of a market and the moment it can be installed: 2 days. A scheduled upgrade that is not installed within 14 days after that expires. See [Owner powers and upgradeability](../risk/admin-powers.md#the-upgrade-timelock).
+A waiting period between the moment a call is scheduled on-chain and the moment it can run. Farmenta has two. The owner's queue: the owner is a `TimelockController`, and every owner call waits 2 days in it. The upgrade timelock: an upgrade scheduled in a market can be installed 2 days later, and expires if it is not installed within 14 days after that. An upgrade passes through both, about 4 days in total. See [Owner powers and upgradeability](../risk/admin-powers.md#the-upgrade-timelock).
 
 ### TWAP
 

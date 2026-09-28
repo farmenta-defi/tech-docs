@@ -27,7 +27,7 @@ constructor(Currency quote_, address owner_)
 | Item | Value |
 |---|---|
 | Upgradeable | No. A market is pointed at a new policy only through a market upgrade. |
-| Owner | One account, two step ownership transfer. Every function that changes state is owner only. |
+| Owner | A `TimelockController` with a delay of 2 days, two step ownership transfer. Every function that changes state is owner only, so every change is scheduled on-chain 2 days before it runs. |
 | `quote()` | The quote currency every accepted pool must contain. It is USDG, and it is also the borrow asset. |
 
 ## Tiers
@@ -164,8 +164,8 @@ The market debt cap is enforced by the market in `borrow`. It is a constant of t
 
 Every function in this section reverts with `OwnableUnauthorizedAccount(account)` when the caller is not the owner.
 
-:::warning[Changes apply to existing loans at once]
-New terms, a freeze, or an LT ramp take effect for loans that already exist. Lowering the liquidation threshold or raising the removal haircut can make a healthy loan liquidatable, and the borrower then pays the liquidator bonus without having done anything. There is no rate limit and no delay on tightening. See [admin powers](../risk/admin-powers.md).
+:::warning[Changes apply to existing loans]
+New terms, a freeze, or an LT ramp take effect for loans that already exist. Lowering the liquidation threshold or raising the removal haircut can make a healthy loan liquidatable, and the borrower then pays the liquidator bonus. The policy itself has no rate limit and no delay on tightening. The notice comes from its owner, a timelock contract that holds every call for 2 days. See [admin powers](../risk/admin-powers.md).
 :::
 
 ### `setTokenConfig`
@@ -383,7 +383,7 @@ A listing can differ from the preset in one direction per term: max LTV and LT d
 While a pool accepts new positions, max LTV is below the liquidation threshold. Three rules follow.
 
 - Setting the threshold at or below max LTV, through `updateTerms` or through a ramp target, is allowed only while the pool is frozen.
-- Tightening can still be instant: freeze, then write the new threshold.
+- Tightening can still be done in one step: freeze, then write the new threshold.
 - Unfreezing is refused when the ramp target is at or below max LTV. The check uses the target, not the threshold in force, so a pool cannot be reopened just before a scheduled ramp takes the threshold below max LTV.
 
 ### Ramp rules

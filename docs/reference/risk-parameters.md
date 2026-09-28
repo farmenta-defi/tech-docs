@@ -36,7 +36,7 @@ Parameters fall into three groups:
 | Per tier (one value per market) | Close factor, reserve factor, reserve floor, interest curve, market debt cap, price check at borrow | Fixed in the contracts, not adjustable per pool |
 | Shared by both markets | Minimum debt, fee cap, removal haircut ceiling, oracle parameters | Fixed in the contracts, not adjustable per pool |
 
-The values in the second and third groups have no setter function. They change only through a contract upgrade, which has to wait out a two day timelock. See [admin powers](../risk/admin-powers.md).
+The values in the second and third groups have no setter function. They change only through a contract upgrade, which waits about four days: two in the owner's queue and two in the market's upgrade timelock. See [admin powers](../risk/admin-powers.md).
 
 :::info[Live values are read on-chain]
 This page shows the presets. The terms that apply to a given pool are stored in its listing and can be stricter than the tables below.
@@ -68,7 +68,7 @@ Rules that apply to these values:
 - **Pool debt cap.** It is stored as an absolute USDG amount and compared with the pool's debt in USDG, so no price is needed.
 
 :::warning[New terms apply to existing loans]
-The owner can tighten a pool's terms at any time, and the new terms take effect immediately for loans that already exist. A lower LT can make a healthy loan liquidatable. See [admin powers](../risk/admin-powers.md).
+The owner can tighten a pool's terms. The change waits two days in the owner's queue, and then takes effect for loans that already exist. A lower LT can make a healthy loan liquidatable. See [admin powers](../risk/admin-powers.md).
 :::
 
 ## Per tier parameters

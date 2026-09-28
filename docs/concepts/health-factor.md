@@ -81,7 +81,7 @@ Crypto prices can move 13.33% in a short time, and interest shrinks the margin e
 | You claim fees with `collectFees` | Down: counted fees leave the position |
 | You remove liquidity with `decreaseLiquidity` | Down: principal leaves the position |
 | You borrow more | Down |
-| The owner lowers the pool's LT, at once or through a ramp | Down |
+| The owner lowers the pool's LT, in one step or through a ramp | Down |
 | The owner raises the pool's removal haircut | Down |
 | You repay | Up |
 | You add liquidity with `increaseLiquidity` | Usually up (it also claims your fees first) |
