@@ -189,7 +189,7 @@ Example: LT is lowered from 75% to 60% while a position is worth $20,300 and owe
 See [admin powers](../risk/admin-powers.md).
 :::
 
-This power exists so the owner can react quickly to a broken oracle, a hook that changes behaviour or a token that collapses.
+This power exists so the protocol can step away from a broken oracle, a hook that changes behaviour or a token that collapses.
 
 ## Owner functions and events
 
@@ -202,7 +202,7 @@ This power exists so the owner can react quickly to a broken oracle, a hook that
 | `setFrozen` | Freezes or unfreezes a pool | `PoolFrozen` |
 | `scheduleLtRamp` | Schedules a gradual fall of LT | `LtRampScheduled` |
 
-All of them can only be called by the owner. Disabling a token does not unlist the pools that contain it. It stops new deposits and liquidity additions for those pools, because both tokens are checked again each time.
+All of them can only be called by the owner. The guardian, an account the owner names for incidents, can also freeze a pool, disable a token and revoke a hook, at once, through `freeze`, `disableToken` and `revokeHook`. It cannot reverse them. Disabling a token does not unlist the pools that contain it. It stops new deposits and liquidity additions for those pools, because both tokens are checked again each time.
 
 ## Related pages
 

@@ -68,6 +68,12 @@ A listed pool that no longer accepts new collateral, new borrowing or added liqu
 
 The liquidation outcome in which the liquidator receives the entire position and the position NFT is burned. It happens when the amount to seize reaches everything the position holds. Any debt left over becomes bad debt. See [Liquidation mechanics](../liquidations/mechanics.md).
 
+## G
+
+### Guardian
+
+The account the owner names to answer incidents. It can pause a market, freeze a pool, disable a token and revoke a hook, each at once. It cannot reverse any of them and holds no other power. See [Owner powers and upgradeability](../risk/admin-powers.md#the-guardian).
+
 ## H
 
 ### Health factor (HF)

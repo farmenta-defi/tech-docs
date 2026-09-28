@@ -95,7 +95,7 @@ Robinhood Chain is an early stage rollup. You should understand these properties
 :::warning[Liquidations depend on the sequencer]
 A liquidation is a transaction like any other. While the sequencer is down, nobody can liquidate, repay or add collateral in time, but prices in the outside world keep moving. When the chain resumes, loans can be deeper under water than the liquidator bonus covers, which leads to bad debt that lenders carry.
 
-On many layer 2 networks, protocols read a Chainlink sequencer uptime feed to detect this situation on-chain. **No Chainlink sequencer uptime feed exists on Robinhood Chain**, so the Farmenta contracts cannot detect sequencer downtime by themselves. The only mitigation is manual: the owner can pause the market, and a pause also stops liquidations. A pause waits two days in the owner's queue, so it covers a long outage and not a short one.
+On many layer 2 networks, protocols read a Chainlink sequencer uptime feed to detect this situation on-chain. **No Chainlink sequencer uptime feed exists on Robinhood Chain**, so the Farmenta contracts cannot detect sequencer downtime by themselves. The only mitigation is manual: the guardian can pause the market at once, and a pause also stops liquidations.
 
 See [oracle and market risks](../risk/oracle-and-market-risks.md) and [pause and emergency](../risk/pause-and-emergency.md).
 :::

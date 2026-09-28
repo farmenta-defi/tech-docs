@@ -29,6 +29,7 @@ Errors thrown by the market contract itself.
 |---|---|---|
 | `ZeroAddress()` | The implementation was deployed with a zero address for one of its dependencies. | Deployment only. Pass the real addresses. |
 | `TierNotSet()` | `initialize` was called with the tier `NONE`. | Deployment only. Initialize with `BLUE_CHIP` or `MEME`. |
+| `NotOwnerOrGuardian(address caller)` | `pause` was called by an account that is neither the owner nor the guardian. | Owner or guardian only. |
 | `NotThePositionManager(address caller)` | An NFT that is not a Uniswap v4 position was pushed to the market. | Send only Uniswap v4 position NFTs. |
 | `PermitRejected(uint256 tokenId)` | `depositCollateralWithPermit`: the signature was not accepted and the market is not approved for the token. | Check the signer, the deadline and the nonce, and build the EIP-712 domain without a `version` field. Or approve the market and call `depositCollateral`. |
 | `NotTheDepositor(uint256 tokenId, address depositor)` | `withdrawCollateral`: the caller is not the address the position is recorded to. `depositor` is that address, or zero if the market does not hold the position. | Call from the recorded address. |
@@ -146,6 +147,7 @@ Errors only the owner can meet:
 | `RampBelowMaxLtvRequiresFreeze(uint16 maxLtvBps, uint16 ltTargetBps)` | `scheduleLtRamp`: the target is at or below max LTV and the pool is not frozen. | Freeze the pool first. |
 | `UnfreezeWouldLeaveNoBorrowingRoom(uint16 maxLtvBps, uint16 ltBps)` | `setFrozen`: the pool cannot be unfrozen because its threshold target is at or below max LTV. | Write terms with max LTV below the threshold first. |
 | `NoPresetForTier()` | Declared in `TierPresets`. The tier is `NONE`, which has no preset. | Configure the tier of the pool's tokens before listing. |
+| `NotOwnerOrGuardian(address caller)` | `freeze`, `disableToken`, `revokeHook`: the caller is neither the owner nor the guardian. | Owner or guardian only. |
 
 ## PriceOracle
 

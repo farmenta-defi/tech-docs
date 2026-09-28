@@ -218,20 +218,28 @@ event UpgradeCancelled(address indexed newImplementation);
 
 A schedule that expires emits nothing. It stays pending until the owner cancels it. To know whether an upgrade waits now, read `pendingUpgrade()` on the market: a schedule made before you started listening is still pending.
 
+### Guardian
+
+```solidity
+event GuardianUpdated(address indexed previousGuardian, address indexed newGuardian);
+```
+
+Emitted by `setGuardian`, and by `initialize` when a guardian is given. `newGuardian` is the zero address when the guardian is removed. `CollateralPolicy` declares the same event for its own guardian.
+
 ### Administration
 
 These events are inherited from OpenZeppelin.
 
 | Event | Emitted when |
 |---|---|
-| `Paused(address account)` | The owner pauses the market. |
+| `Paused(address account)` | The owner or the guardian pauses the market. `account` is the caller. |
 | `Unpaused(address account)` | The owner unpauses the market. |
 | `Upgraded(address indexed implementation)` | The proxy is pointed at a new implementation, which was scheduled before. |
 | `Initialized(uint64 version)` | The proxy is initialized. |
 | `OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner)` | The owner nominates a new owner. |
 | `OwnershipTransferred(address indexed previousOwner, address indexed newOwner)` | The nominated owner accepts, or ownership is set at initialization. |
 
-`Paused`, `UpgradeScheduled`, `Upgraded` and `OwnershipTransferred` are the events to watch if you monitor the owner's powers. See [admin powers](../risk/admin-powers.md).
+`Paused`, `GuardianUpdated`, `UpgradeScheduled`, `Upgraded` and `OwnershipTransferred` are the events to watch if you monitor the owner's powers. See [admin powers](../risk/admin-powers.md).
 
 ## CollateralPolicy
 
@@ -239,13 +247,13 @@ These events are inherited from OpenZeppelin.
 event TokenConfigured(Currency indexed currency, bool enabled, Tier tier, uint8 decimals, address priceFeed);
 ```
 
-Emitted by `setTokenConfig`. Carries the whole new configuration of the token.
+Emitted by `setTokenConfig`, and by `disableToken` with `enabled` false. Carries the whole configuration of the token.
 
 ```solidity
 event HookAllowlisted(address indexed hooks, bool allowed);
 ```
 
-Emitted by `setHookAllowlist`.
+Emitted by `setHookAllowlist`, and by `revokeHook` with `allowed` false.
 
 ```solidity
 event PoolListed(PoolId indexed poolId, Tier tier, ListingParams params);
@@ -274,7 +282,7 @@ Emitted by `updateTerms`. The new terms apply from this event on, and any LT ram
 event PoolFrozen(PoolId indexed poolId, bool frozen);
 ```
 
-Emitted by `setFrozen`. `frozen` is the new state.
+Emitted by `setFrozen`, and by `freeze` with `frozen` true. `frozen` is the new state.
 
 ```solidity
 event LtRampScheduled(PoolId indexed poolId, uint16 ltFromBps, uint16 ltTargetBps, uint40 start, uint40 duration);
@@ -284,7 +292,7 @@ Emitted by `scheduleLtRamp`. `ltFromBps` is the liquidation threshold in force a
 
 The liquidation threshold during a ramp changes every second without any event. Compute it from the last `LtRampScheduled`, or call `effectiveLt`.
 
-`CollateralPolicy` also emits `OwnershipTransferStarted` and `OwnershipTransferred`, with the signatures shown above.
+`CollateralPolicy` also emits `GuardianUpdated`, `OwnershipTransferStarted` and `OwnershipTransferred`, with the signatures shown above.
 
 ## TwapRecorder
 
@@ -328,6 +336,7 @@ The age of the newest `Recorded` event of a pool tells you how close the pool is
 | `UpgradeScheduled` | `FarmentaMarket` | `newImplementation` |
 | `UpgradeCodeBound` | `FarmentaMarket` | `newImplementation` |
 | `UpgradeCancelled` | `FarmentaMarket` | `newImplementation` |
+| `GuardianUpdated` | `FarmentaMarket` | `previousGuardian`, `newGuardian` |
 | `Deposit` | `FarmentaMarket` (ERC-4626) | `sender`, `owner` |
 | `Withdraw` | `FarmentaMarket` (ERC-4626) | `sender`, `receiver`, `owner` |
 | `TokenConfigured` | `CollateralPolicy` | `currency` |
@@ -336,6 +345,7 @@ The age of the newest `Recorded` event of a pool tells you how close the pool is
 | `PoolTermsUpdated` | `CollateralPolicy` | `poolId` |
 | `PoolFrozen` | `CollateralPolicy` | `poolId` |
 | `LtRampScheduled` | `CollateralPolicy` | `poolId` |
+| `GuardianUpdated` | `CollateralPolicy` | `previousGuardian`, `newGuardian` |
 | `Recorded` | `TwapRecorder` | `poolId` |
 
 ## Related pages

@@ -33,6 +33,7 @@ The Farmenta contracts are not deployed yet. Their addresses will be published i
 | LiquidatorHelper (Blue-chip) | Optional helper that liquidates Blue-chip loans with a flash loan in one transaction | To be published |
 | LiquidatorHelper (Meme) | Optional helper that liquidates Meme loans with a flash loan in one transaction | To be published |
 | TimelockController | The owner of both markets and of the policy. Every owner call waits in its queue | To be published |
+| Guardian | The account that can pause a market and close a pool, a token or a hook to new positions, at once | To be published |
 
 You always interact with the two market proxies, never with the implementation. Each contract is described in the [architecture overview](./architecture.md).
 

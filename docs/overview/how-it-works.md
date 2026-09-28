@@ -52,7 +52,7 @@ A keeper is an automated program. The team plans to run keepers for two jobs: re
 
 ### Owner
 
-The owner is the admin of the protocol. It is a timelock contract: every owner call is scheduled on-chain first and runs two days later at the earliest. It lists pools, sets and tightens risk parameters, can pause a market, and can withdraw the part of the reserve that lies above the reserve floor. The owner can also upgrade the market contract, which takes about four days. These powers are significant and are described in full in [owner powers and upgradeability](../risk/admin-powers.md).
+The owner is the admin of the protocol. It is a timelock contract: every owner call is scheduled on-chain first and runs two days later at the earliest. It lists pools, sets and tightens risk parameters, can pause a market, and can withdraw the part of the reserve that lies above the reserve floor. The owner can also upgrade the market contract, which takes about four days. For incidents the owner names a guardian, which can pause a market and stop new positions in a pool at once, and cannot undo either. These powers are significant and are described in full in [owner powers and upgradeability](../risk/admin-powers.md).
 
 ## The life of a loan
 

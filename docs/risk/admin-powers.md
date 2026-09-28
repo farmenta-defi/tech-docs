@@ -1,6 +1,6 @@
 ---
 title: Owner powers and upgradeability
-description: Everything the owner can do on Farmenta, how long each action waits, what the contracts enforce, and what an upgrade can override.
+description: What the owner and the guardian can do on Farmenta, how long each action waits, what the contracts enforce, and what an upgrade can override.
 sidebar_position: 2
 ---
 
@@ -19,7 +19,7 @@ Nobody calls an owner function directly. The timelock has no admin: its roles an
 A small example: on Monday at 10:00 the proposer schedules `updateTerms` for a pool, with a lower liquidation threshold. The call can run from Wednesday at 10:00. Until it runs, the pool's terms are unchanged.
 
 :::warning[Owner actions wait two days, upgrades about four]
-`FarmentaMarket` is a UUPS upgradeable contract, and only the owner can authorize an upgrade. An upgrade replaces the market's logic, so it can change any rule on this page, including how collateral and funds are held. It waits twice: two days in the owner's queue, then two days in the market's own upgrade timelock. A change to a pool's terms, such as a lower liquidation threshold, waits two days in the owner's queue. The same wait applies to `pause` and to freezing a pool, so those are not immediate either. See [the upgrade timelock](#the-upgrade-timelock).
+`FarmentaMarket` is a UUPS upgradeable contract, and only the owner can authorize an upgrade. An upgrade replaces the market's logic, so it can change any rule on this page, including how collateral and funds are held. It waits twice: two days in the owner's queue, then two days in the market's own upgrade timelock. A change to a pool's terms, such as a lower liquidation threshold, waits two days in the owner's queue. Four responses to an incident do not wait, because the [guardian](#the-guardian) holds them as well: pausing a market, freezing a pool, disabling a token and revoking a hook. See [the upgrade timelock](#the-upgrade-timelock).
 :::
 
 ### How to read the owner's queue
@@ -33,6 +33,38 @@ A small example: on Monday at 10:00 the proposer schedules `updateTerms` for a p
 | Who owns a contract | `owner()` on each market and on the policy. |
 
 Ownership moves in two steps: the new owner must accept. At deployment the policy is handed to the timelock the same way, and the timelock accepts through its own queue, so the deploying account owns the policy until that call has run. Read `owner()` to see which account holds it.
+
+## The guardian
+
+A building has a fire alarm that the person on duty can set off without asking the manager. It closes the doors to newcomers at once. Opening them again is the manager's decision. Farmenta's guardian is the person on duty.
+
+The guardian is one account the owner names, on each market and on the policy. It exists because an incident does not wait two days. It can do four things, each at once:
+
+| Contract | Function | Effect | The reverse, owner only |
+|---|---|---|---|
+| `FarmentaMarket` | `pause()` | Every action that takes on new risk stops, liquidation included | `unpause()` |
+| `CollateralPolicy` | `freeze(poolId)` | The pool takes no new collateral and no new borrowing | `setFrozen(poolId, false)` |
+| `CollateralPolicy` | `disableToken(currency)` | The token is refused in new collateral and in new listings | `setTokenConfig` with `enabled = true` |
+| `CollateralPolicy` | `revokeHook(hooks)` | Pools behind the hook take no new positions | `setHookAllowlist(hooks, true)` |
+
+A small example: on Monday at 10:00 a token of a listed pool turns out to be compromised. The guardian freezes the pool at 10:05, and from that block the pool takes no new collateral and no new loan. Reopening the pool is an owner call: scheduled on Monday, it can run on Wednesday.
+
+What the guardian cannot do: reverse any of the four, change a pool's terms, LT, haircut or debt cap, list a pool, withdraw reserves, rescue assets, schedule or install an upgrade, move ownership, or name the next guardian. It cannot move anyone's assets.
+
+`freeze`, `disableToken` and `revokeHook` leave existing loans as they were: `repay`, `withdrawCollateral`, `collectFees`, `decreaseLiquidity` and `liquidate` keep working, and a disabled token is still priced. `disableToken` and `revokeHook` close the way in for positions. They do not stop `borrow` against collateral the market already holds. `freeze` does, pool by pool.
+
+:::warning[A pause stops liquidations too]
+A pause made in error, or by a guardian key that was stolen, holds liquidations back for as long as it lasts, and prices that move in that time can turn into bad debt. Only the owner can lift a pause. To keep a pause short, the owner's procedure is to keep one `unpause` call per market waiting in its queue. Scheduled ahead of time, that call is ready two days later and stays ready, so the owner can lift a pause in one transaction. Once it is used, the next one is scheduled and waits two days again.
+:::
+
+How to see what the guardian is and does:
+
+| What you want to know | Where |
+|---|---|
+| Who the guardian is | `guardian()` on each market and on the policy. The zero address means there is none. |
+| When it was named or replaced | The `GuardianUpdated(previousGuardian, newGuardian)` event. Replacing the guardian is an owner call, so it shows in the owner's queue first. |
+| Who paused a market | `Paused(account)` carries the caller. |
+| What it did on the policy | `freeze`, `disableToken` and `revokeHook` emit the same events as the owner's functions: `PoolFrozen`, `TokenConfigured` and `HookAllowlisted`. An owner call arrives in a transaction that also carries the timelock's `CallExecuted`. A guardian's does not. |
 
 ## What the contracts refuse
 
@@ -76,7 +108,7 @@ What the timelock does and does not do:
 
 - It gives notice. Lenders and borrowers have two days after `UpgradeScheduled` to repay, withdraw collateral and redeem shares before a new implementation can be installed, and two more days before that while the scheduling call waits in the owner's queue. The owner keeps the power to upgrade.
 - Vault withdrawals are limited by the cash in the market. At high utilization a lender may not be able to withdraw everything before the `eta`.
-- It covers upgrades only. `pause`, `unpause` and the owner's powers on `CollateralPolicy` do not pass through it. They wait two days in the owner's queue, like every owner call.
+- It covers upgrades only. `pause`, `unpause` and the owner's powers on `CollateralPolicy` do not pass through it. They wait two days in the owner's queue, like every owner call. The guardian's four actions wait in neither.
 - The data passed to `upgradeToAndCall` is not part of the schedule. It is run by the scheduled implementation, so it can only run code that implementation contains.
 - The code hash is compared when the upgrade is scheduled and when it is installed. The market cannot enforce that the code stays at the address in between, so check the scheduled address during the delay.
 
@@ -102,7 +134,7 @@ The contract allows the owner to lower LT on purpose. It lets the protocol step 
 
 ## What the owner can do
 
-Every power in the two tables below is an owner call, so each one waits two days in the owner's queue before it runs. The limits in the last column are the ones the market or the policy enforces when the call runs.
+Every power in the two tables below is an owner call, so each one waits two days in the owner's queue before it runs. What the [guardian](#the-guardian) shares with the owner takes effect at once when the guardian does it. The limits in the last column are the ones the market or the policy enforces when the call runs.
 
 ### On each market (`FarmentaMarket`)
 
@@ -110,11 +142,12 @@ Every power in the two tables below is an owner call, so each one waits two days
 |---|---|---|
 | **Upgrade the implementation** | Replaces all market logic. Can change any rule on this page, move collateral NFTs, move USDG, or rewrite the debt ledger. Also the only way to change the oracle, valuer, policy and interest rate model addresses, the reserve factor, the reserve floor, the close factor and the debt cap per market. | Owner only. The implementation must be scheduled in the market first and can be installed from 2 days later, for 14 days, and only while the code at its address is the code that was scheduled. With the owner's queue before it, that is about four days. See [the upgrade timelock](#the-upgrade-timelock). |
 | **`scheduleUpgrade` and `cancelUpgrade`** | Schedules a new implementation, or withdraws the scheduled one. Scheduling changes nothing in the market until the upgrade is installed. | One schedule at a time. The scheduled address must hold code. Scheduling again after a cancel starts a full delay. |
-| **`pause` and `unpause`** | Stops every action that adds risk or reads a price, including liquidations. Repay and withdrawals stay open. See [Pause and emergency behaviour](./pause-and-emergency.md). | No maximum duration. Each market is paused separately. |
+| **`pause` and `unpause`** | Stops every action that adds risk or reads a price, including liquidations. Repay and withdrawals stay open. See [Pause and emergency behaviour](./pause-and-emergency.md). | `pause` is open to the owner and the guardian, `unpause` to the owner only. No maximum duration. Each market is paused separately. |
 | **`withdrawReserves(amount, to)`** | Moves reserve USDG to any address. Does not change the share price, because lender funds already exclude the reserve. It does use the same cash lenders withdraw from. | Only the part above the reserve floor (1% of `totalAssets` in Blue-chip, 2.5% in Meme), and never more than the cash in the market. |
 | **`rescueUnaccountedToken(tokenId, to)`** | Sends out a position NFT that reached the market without being recorded, for example one minted directly to the market's address. | Reverts for any NFT that has a loan record, so it cannot be used on deposited collateral. |
 | **`transferOwnership`, `acceptOwnership`, `renounceOwnership`** | Hands every power on this page to another account, or gives them up for good. After a renounce nobody can pause, unpause, upgrade or withdraw reserves. A market that is paused at that moment stays paused: liquidations, borrowing and deposits never resume, while repay and withdrawals stay open. | A transfer needs acceptance by the new owner. A renounce is a single call. |
 | **`rescueUnaccountedEth(to)`** | Sends out the market's whole native ETH balance. | No legitimate flow leaves ETH in the market between transactions, so this balance belongs to no user. Cannot run inside another market call. |
+| **`setGuardian(newGuardian)`** | Names the guardian of the market, or removes it with the zero address. | Owner only, so a guardian is replaced through the queue. |
 
 ### On pool listings (`CollateralPolicy`)
 
@@ -127,6 +160,7 @@ Every power in the two tables below is an owner call, so each one waits two days
 | **`updateTerms`** | Rewrites a listed pool's terms. When the call runs, the new terms apply to existing loans and cancel any running LT ramp. Lowering LT can make healthy loans liquidatable. Raising the bonus makes every liquidation more expensive for the borrower. | Same preset bounds as `list`. Within those bounds terms can move in either direction. The contract sets a minimum bonus per tier and no maximum. While the pool is open, `maxLTV` must stay below LT. |
 | **`setFrozen`** | A frozen pool accepts no new collateral, no new borrowing and no added liquidity. Existing loans keep accruing interest and can be repaid, reduced, withdrawn and liquidated. | Unfreezing is refused if the pool's LT target is at or below its max LTV. |
 | **`scheduleLtRamp`** | Lowers LT linearly from its current value to a target over a chosen period. Positions are pushed toward liquidation as the ramp runs. | The ramp cannot start in the past, must have a duration above zero, and can only go down. A target at or below max LTV requires a frozen pool. There is no minimum duration and no floor. |
+| **`setGuardian(newGuardian)`** | Names the guardian of the policy, or removes it with the zero address. | Owner only, so a guardian is replaced through the queue. |
 | **Raise the removal haircut** (through `updateTerms`) | Cuts the recognised value of every position in the pool. A healthy loan can become liquidatable in the same block. | Only while the pool is frozen. Capped at 2,000 bps (20%). Only for pools whose hook is able to take a cut on removal. Lowering the haircut is allowed on an open pool too. |
 
 The tier presets are listed in [Risk parameters](../reference/risk-parameters.md), and the listing lifecycle is explained in [Pool listing](../concepts/pool-listing.md).

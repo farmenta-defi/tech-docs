@@ -144,7 +144,7 @@ Not yet. The contracts are tested with unit tests, tests against a fork of the l
 
 ### Who controls the contracts?
 
-The owner, which is a timelock contract. It can upgrade the market contract, pause markets, list and freeze pools, change pool terms within the tier presets, and withdraw reserves above the floor. Every one of those calls is scheduled on-chain first and runs two days later at the earliest. An upgrade waits a second time in the market itself, about four days in total. See [Owner powers and upgradeability](../risk/admin-powers.md).
+The owner, which is a timelock contract. It can upgrade the market contract, pause markets, list and freeze pools, change pool terms within the tier presets, and withdraw reserves above the floor. Every one of those calls is scheduled on-chain first and runs two days later at the earliest. An upgrade waits a second time in the market itself, about four days in total. For incidents the owner names a guardian, an account that can pause a market and close a pool, a token or a hook to new positions at once, and can do nothing else. See [Owner powers and upgradeability](../risk/admin-powers.md).
 
 ### Can the owner take my collateral or my USDG?
 

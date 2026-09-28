@@ -188,13 +188,15 @@ function initialize(
     string calldata name_,
     string calldata symbol_,
     ICollateralPolicy.Tier tier_,
-    address owner_
+    address owner_,
+    address guardian_
 ) external initializer
 ```
 
 Initializes one proxy. It can run once.
 
 - Sets the vault asset, the share token name and symbol, the tier and the owner.
+- Stores `guardian_` as the guardian and emits `GuardianUpdated(address(0), guardian_)`. With the zero address the market starts without a guardian and emits nothing for it.
 - Sets `borrowIndex` to `1e18` and `lastAccrual` to the current timestamp.
 - Sets the reserve factor and reserve floor from the tier: 1,500 and 100 basis points for Blue-chip, 2,500 and 250 basis points for Meme.
 
@@ -718,22 +720,32 @@ On a full seizure `out0` and `out1` are the balance change of `to` across the pa
 
 ## Owner functions
 
-Every function in this section is restricted to the market owner and reverts with `OwnableUnauthorizedAccount(account)` for anyone else.
+Every function in this section is restricted to the market owner and reverts with `OwnableUnauthorizedAccount(account)` for anyone else. The exception is `pause`, which is open to the guardian as well.
 
 :::info[Owner powers]
-The owner is a `TimelockController`, so every call in this section is scheduled on-chain and runs 2 days later at the earliest. An upgrade also waits in the market's own upgrade timelock. What each power means for users is described in [owner powers](../risk/admin-powers.md).
+The owner is a `TimelockController`, so every call in this section is scheduled on-chain and runs 2 days later at the earliest. An upgrade also waits in the market's own upgrade timelock. A `pause` from the guardian does not wait. What each power means for users is described in [owner powers](../risk/admin-powers.md).
 :::
 
 ### `pause` and `unpause`
 
 ```solidity
-function pause() external onlyOwner
+function pause() external
 function unpause() external onlyOwner
 ```
 
-`pause` stops the functions marked "Reverts" in the [paused vs frozen](#paused-vs-frozen) table. `unpause` resumes them. They emit `Paused(account)` and `Unpaused(account)`.
+`pause` stops the functions marked "Reverts" in the [paused vs frozen](#paused-vs-frozen) table. `unpause` resumes them. They emit `Paused(account)` and `Unpaused(account)`, where `account` is the caller.
 
-Robinhood Chain has no sequencer uptime feed, so pausing is the lever the owner has when the sequencer or an oracle cannot be trusted.
+`pause` is open to the owner and to the guardian. Anyone else, the zero address included, gets `NotOwnerOrGuardian(caller)`. `unpause` is the owner's alone: a pause also stops liquidation, so the account that can start one is not the one that decides when it ends.
+
+Robinhood Chain has no sequencer uptime feed, so pausing is the lever the guardian and the owner have when the sequencer or an oracle cannot be trusted.
+
+### `setGuardian`
+
+```solidity
+function setGuardian(address newGuardian) external onlyOwner
+```
+
+Names the guardian, or removes it with the zero address. Emits `GuardianUpdated(previousGuardian, newGuardian)`. What the guardian can and cannot do is described in [owner powers](../risk/admin-powers.md#the-guardian).
 
 ### `withdrawReserves`
 
@@ -867,6 +879,7 @@ All views use the ledger as of the last accrual. They do not add the interest th
 | `totalReservesWithdrawn() returns (uint256)` | The running total of reserves the owner has withdrawn. |
 | `reserveFloorBps() returns (uint16)` | The reserve floor rate, in basis points. |
 | `paused() returns (bool)` | Whether the market is paused. |
+| `guardian() returns (address)` | The account that may pause besides the owner, or zero when there is none. |
 | `pendingUpgrade() returns (address implementation, uint256 eta)` | The scheduled implementation and the earliest time it can be installed. Both are zero when nothing is scheduled. |
 | `pendingUpgradeCodehash() returns (bytes32)` | The hash of the code the scheduled implementation held when it was scheduled, or zero when nothing is scheduled. |
 | `TIMELOCK_DELAY() returns (uint256)`, `TIMELOCK_GRACE() returns (uint256)` | The upgrade delay (2 days) and the installation window after it (14 days), in seconds. |

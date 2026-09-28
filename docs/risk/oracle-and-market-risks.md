@@ -48,7 +48,7 @@ Who bears it: a lasting depeg changes the real value of what lenders are owed, a
 
 On many rollups, lending protocols read a Chainlink feed that reports whether the sequencer is running, and they give borrowers a grace period after an outage. Robinhood Chain has no such feed.
 
-The mitigation is manual: the owner can [pause](./pause-and-emergency.md) the market. A pause waits two days in the owner's queue before it takes effect, so it covers a long outage and not a short one. A pause also stops liquidations, so prices can keep moving while the market is paused, and a loan that was unhealthy can become bad debt by the time the market reopens.
+The mitigation is manual: the guardian can [pause](./pause-and-emergency.md) the market at once. A pause also stops liquidations, so prices can keep moving while the market is paused, and a loan that was unhealthy can become bad debt by the time the market reopens.
 
 ## Meme market
 

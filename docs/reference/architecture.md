@@ -214,11 +214,11 @@ The vault uses a decimals offset of 3. Shares carry three more decimals than USD
 
 | Contract | Owner |
 |---|---|
-| `FarmentaMarket` (each proxy) | `Ownable2StepUpgradeable`. The owner can pause, withdraw reserves above the floor, rescue unaccounted assets, and upgrade through the timelock. |
-| `CollateralPolicy` | `Ownable2Step`. The owner configures tokens, the hook allowlist, listings, freezes and LT ramps. |
+| `FarmentaMarket` (each proxy) | `Ownable2StepUpgradeable`. The owner can pause, withdraw reserves above the floor, rescue unaccounted assets, and upgrade through the timelock. The guardian can pause. |
+| `CollateralPolicy` | `Ownable2Step`. The owner configures tokens, the hook allowlist, listings, freezes and LT ramps. The guardian can freeze a pool, disable a token and revoke a hook. |
 | `PriceOracle`, `TwapRecorder`, `PositionValuer`, `InterestRateModel`, `MarketLens`, `LiquidatorHelper` | No owner and no privileged function. |
 
-The owner of both markets and of the policy is a `TimelockController` with a delay of 2 days and no admin. Every owner call is scheduled in it by a proposer, waits the delay, and is run by an executor. See [owner powers](../risk/admin-powers.md).
+The owner of both markets and of the policy is a `TimelockController` with a delay of 2 days and no admin. Every owner call is scheduled in it by a proposer, waits the delay, and is run by an executor. Each of the three contracts also has a guardian, an account the owner names, which can stop new risk at once and cannot undo it. See [owner powers](../risk/admin-powers.md).
 
 Ownership transfers are two step: the current owner nominates, and the new owner must accept.
 

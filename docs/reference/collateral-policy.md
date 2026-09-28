@@ -28,6 +28,7 @@ constructor(Currency quote_, address owner_)
 |---|---|
 | Upgradeable | No. A market is pointed at a new policy only through a market upgrade. |
 | Owner | A `TimelockController` with a delay of 2 days, two step ownership transfer. Every function that changes state is owner only, so every change is scheduled on-chain 2 days before it runs. |
+| Guardian | One account the owner names, or none. It can `freeze`, `disableToken` and `revokeHook`, each at once, and nothing else. |
 | `quote()` | The quote currency every accepted pool must contain. It is USDG, and it is also the borrow asset. |
 
 ## Tiers
@@ -297,6 +298,44 @@ Emits `LtRampScheduled(poolId, ltFromBps, ltTargetBps, start, duration)`.
 
 The ramp starts from the threshold in force at the moment of the call. Scheduling a second ramp can therefore never move the threshold back up.
 
+### `setGuardian`
+
+```solidity
+function setGuardian(address newGuardian) external onlyOwner
+```
+
+Names the guardian, or removes it with the zero address. Emits `GuardianUpdated(previousGuardian, newGuardian)`.
+
+## Guardian functions
+
+These three functions are open to the owner and to the guardian. Anyone else, the zero address included, gets `NotOwnerOrGuardian(caller)`. Each one writes a single flag and can only stop new risk. The reverse of each is an owner function. See [the guardian](../risk/admin-powers.md#the-guardian).
+
+### `freeze`
+
+```solidity
+function freeze(PoolId poolId) external
+```
+
+Freezes a pool, exactly as `setFrozen(poolId, true)` does. Reverts with `PoolNotListed(poolId)` for a pool that is not listed. Freezing a pool that is already frozen is accepted. Emits `PoolFrozen(poolId, true)`.
+
+### `disableToken`
+
+```solidity
+function disableToken(Currency currency) external
+```
+
+Writes `enabled = false` for the token and leaves its tier, decimals and price feed as they were, so positions already held are still priced. Emits `TokenConfigured(currency, false, tier, decimals, priceFeed)` with the values that stayed.
+
+### `revokeHook`
+
+```solidity
+function revokeHook(address hooks) external
+```
+
+Takes a hook off the allowlist, exactly as `setHookAllowlist(hooks, false)` does. Emits `HookAllowlisted(hooks, false)`. A hook that passes the permission check without the allowlist is not stopped by this.
+
+`disableToken` and `revokeHook` close `checkPool`, which deposits, `mintAndDeposit` and `increaseLiquidity` go through. `borrow` asks `acceptsNewPositions`, which reads the listing only, so a loan can still be drawn against collateral the market already holds until the pool is frozen.
+
 ## Views
 
 ### `termsOf`
@@ -368,6 +407,7 @@ Example: a pool with a threshold of 75% is ramped to 65% over 10 days. Four days
 Currency public immutable quote;
 mapping(Currency currency => TokenConfig) public tokenConfig;
 mapping(address hooks => bool) public hookAllowlist;
+address public guardian;
 ```
 
 `tokenConfig(currency)` returns `(enabled, tier, decimals, priceFeed)`.
@@ -439,12 +479,13 @@ Passing the check is not acceptance. The mask covers five permissions and not ev
 
 | Event | Emitted when |
 |---|---|
-| `TokenConfigured(Currency indexed currency, bool enabled, Tier tier, uint8 decimals, address priceFeed)` | `setTokenConfig` writes a token configuration. |
-| `HookAllowlisted(address indexed hooks, bool allowed)` | `setHookAllowlist` changes an entry. |
+| `TokenConfigured(Currency indexed currency, bool enabled, Tier tier, uint8 decimals, address priceFeed)` | `setTokenConfig` writes a token configuration, or `disableToken` disables a token. |
+| `HookAllowlisted(address indexed hooks, bool allowed)` | `setHookAllowlist` changes an entry, or `revokeHook` removes one. |
 | `PoolListed(PoolId indexed poolId, Tier tier, ListingParams params)` | `list` lists a pool. |
 | `PoolTermsUpdated(PoolId indexed poolId, ListingParams params)` | `updateTerms` rewrites the terms. |
-| `PoolFrozen(PoolId indexed poolId, bool frozen)` | `setFrozen` freezes or unfreezes a pool. |
+| `PoolFrozen(PoolId indexed poolId, bool frozen)` | `setFrozen` freezes or unfreezes a pool, or `freeze` freezes one. |
 | `LtRampScheduled(PoolId indexed poolId, uint16 ltFromBps, uint16 ltTargetBps, uint40 start, uint40 duration)` | `scheduleLtRamp` schedules a ramp. |
+| `GuardianUpdated(address indexed previousGuardian, address indexed newGuardian)` | `setGuardian` names or removes the guardian. |
 
 `PoolListed` and `PoolTermsUpdated` carry the pool id and the terms as written by the owner. They do not carry the full pool key.
 
@@ -470,6 +511,7 @@ Passing the check is not acceptance. The mask covers five permissions and not ev
 | `RampBelowMaxLtvRequiresFreeze(uint16 maxLtvBps, uint16 ltTargetBps)` | The ramp target is at or below max LTV and the pool is not frozen. |
 | `UnfreezeWouldLeaveNoBorrowingRoom(uint16 maxLtvBps, uint16 ltBps)` | The pool cannot be unfrozen because its threshold target is at or below max LTV. |
 | `NoPresetForTier()` | Declared in `TierPresets`. The tier is `NONE`, which has no preset. |
+| `NotOwnerOrGuardian(address caller)` | `freeze`, `disableToken` or `revokeHook` was called by an account that is neither the owner nor the guardian. |
 
 What a caller can do about each error is on the [errors page](./errors.md).
 

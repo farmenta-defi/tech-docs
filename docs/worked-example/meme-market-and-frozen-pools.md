@@ -74,7 +74,7 @@ The two markets are separate contracts with separate cash, debt, reserves and sh
 
 ## When a pool is frozen or its LT is lowered
 
-The owner can freeze Budi's ETH/USDG pool with `setFrozen`, and can lower its liquidation threshold either in one step with `updateTerms` or gradually with a scheduled LT ramp (`scheduleLtRamp`). These tools exist so the protocol can step away from a pool that has gone bad. Each of these calls waits two days in the owner's queue before it runs.
+The owner can freeze Budi's ETH/USDG pool with `setFrozen`, and can lower its liquidation threshold either in one step with `updateTerms` or gradually with a scheduled LT ramp (`scheduleLtRamp`). These tools exist so the protocol can step away from a pool that has gone bad. Each of these calls waits two days in the owner's queue before it runs. The freeze alone can also come from the guardian, at once, with `freeze`.
 
 ### What stops and what continues
 
@@ -96,7 +96,7 @@ Go back to the end of T3. Budi's position is still worth $20,300 and his debt ha
 HF at LT 75% = $20,300 × 75% / $12,300          = 1.238
 ```
 
-Now the owner freezes the pool and lowers its LT to 60%. Both calls were scheduled two days earlier. When they run, the new threshold applies to existing loans:
+Now the pool is frozen and the owner lowers its LT to 60%. The new LT was scheduled two days earlier. When that call runs, the new threshold applies to existing loans:
 
 ```text
 HF at LT 60% = $20,300 × 60% / $12,300          = 0.990     below 1, can be liquidated
