@@ -546,7 +546,7 @@ This matters most when you run your own indexer from a late start block.
 
 ## Run your own indexer
 
-The source is at [github.com/farmenta-defi/indexer](https://github.com/farmenta-defi/indexer), under the MIT license. You need Node 22 or newer, pnpm, a Postgres database and an RPC endpoint from a provider, because the public endpoint is rate limited (see [network](./network.md)). You give the indexer the Farmenta contract addresses and their deployment blocks in a small JSON file. The README in the repository has the steps.
+The source is at [github.com/farmenta-defi/indexer](https://github.com/farmenta-defi/indexer), under the MIT license. You need Node 22 or newer, pnpm 10 or newer, a Postgres database and an RPC endpoint from a provider, because the public endpoint is rate limited (see [network](./network.md)). You give the indexer the Farmenta contract addresses and their deployment blocks in a small JSON file. The README in the repository has the steps.
 
 ## Related pages
 
