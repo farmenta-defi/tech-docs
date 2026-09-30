@@ -71,8 +71,15 @@ Addresses are not case sensitive. Some are printed here in lowercase and some wi
 | Token | Decimals | Address | Explorer | What Farmenta uses it for |
 |---|---|---|---|---|
 | USDG | 6 | `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168` | [View](https://robinhoodchain.blockscout.com/address/0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168) | The asset lenders supply and borrowers borrow. Every accepted pool is quoted in USDG. |
-| WETH | 18 | `0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73` | [View](https://robinhoodchain.blockscout.com/address/0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73) | One side of WETH/USDG pools in the Blue-chip market. |
-| Native ETH | 18 | The zero address in a pool key | Not applicable | One side of ETH/USDG pools in the Blue-chip market. |
+| WETH | 18 | `0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73` | [View](https://robinhoodchain.blockscout.com/address/0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73) | Accepted as a Blue-chip token and priced by the ETH/USD feed. No pool with WETH is listed. |
+| Native ETH | 18 | The zero address in a pool key | Not applicable | One side of the ETH/USDG pool in the Blue-chip market. |
+| META | 18 | `0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35` | [View](https://robinhoodchain.blockscout.com/address/0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35) | One side of the META/USDG pool in the Blue-chip market. A tokenized stock; its name on chain is "Meta Platforms • Robinhood Token". |
+| NVDA | 18 | `0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC` | [View](https://robinhoodchain.blockscout.com/address/0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC) | One side of the NVDA/USDG pool in the Blue-chip market. A tokenized stock; its name on chain is "NVIDIA • Robinhood Token". |
+| CASHCAT | 18 | `0x020bfC650A365f8BB26819deAAbF3E21291018b4` | [View](https://robinhoodchain.blockscout.com/address/0x020bfC650A365f8BB26819deAAbF3E21291018b4) | One side of the CASHCAT/USDG pool in the Meme market. |
+| PONS | 18 | `0x39dBED3a2bd333467115dE45665cC57F813C4571` | [View](https://robinhoodchain.blockscout.com/address/0x39dBED3a2bd333467115dE45665cC57F813C4571) | One side of the PONS/USDG pool in the Meme market. |
+| AI | 18 | `0x2E8c31162b855A2ffa90F6F8634643Ad6F111e18` | [View](https://robinhoodchain.blockscout.com/address/0x2E8c31162b855A2ffa90F6F8634643Ad6F111e18) | One side of the AI/USDG pool in the Meme market. |
+
+Several tokens can share a ticker, so identify a token by its address, not by its symbol.
 
 Native ETH has no token contract. In a Uniswap v4 pool key, native ETH is written as the zero address (`address(0)`), not as the WETH address. An ETH/USDG pool and a WETH/USDG pool are different pools with different pool ids.
 
@@ -82,8 +89,10 @@ Native ETH has no token contract. In a Uniswap v4 pool key, native ETH is writte
 |---|---|---|---|
 | ETH/USD | `0x78F3556b67E17Df817D51Ef5a990cDaF09E8d3A9` | [View](https://robinhoodchain.blockscout.com/address/0x78F3556b67E17Df817D51Ef5a990cDaF09E8d3A9) | The USD price of native ETH and WETH. |
 | USDG/USD | `0x61B7e5650328764B076A108EFF5fa7282a1B9aD2` | [View](https://robinhoodchain.blockscout.com/address/0x61B7e5650328764B076A108EFF5fa7282a1B9aD2) | The USD price of USDG, used to value debt and the USDG side of every position. |
+| META/USD | `0x7C38C00C30BEe9378381E7B6135d7283356D71b1` | [View](https://robinhoodchain.blockscout.com/address/0x7C38C00C30BEe9378381E7B6135d7283356D71b1) | The USD price of META. The feed names itself "Robinhood META / USD". |
+| NVDA/USD | `0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15` | [View](https://robinhoodchain.blockscout.com/address/0x379EC4f7C378F34a1B47E4F3cbeBCbAC3E8E9F15) | The USD price of NVDA. The feed names itself "RHNVDA / USD". |
 
-Meme tokens have no Chainlink feed. Their price comes from the on-chain `TwapRecorder`. There is also no Chainlink sequencer uptime feed on Robinhood Chain. See [network](./network.md) and [price oracles](../concepts/price-oracles.md).
+The meme tokens CASHCAT, PONS and AI have no Chainlink feed. Their price comes from the on-chain `TwapRecorder`. There is also no Chainlink sequencer uptime feed on Robinhood Chain. See [network](./network.md) and [price oracles](../concepts/price-oracles.md).
 
 ## How to verify an address
 
