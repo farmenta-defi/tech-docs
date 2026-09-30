@@ -26,8 +26,8 @@ Two values in `docusaurus.config.ts` can be set through the environment. Both ha
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `DOCS_URL` | `https://tech-docs-pearl.vercel.app` | Public address of this site |
-| `FARMENTA_APP_URL` | `https://app-farmenta.vercel.app/` | Target of the "Launch App" button |
+| `DOCS_URL` | `https://docs.farmenta.fun` | Public address of this site |
+| `FARMENTA_APP_URL` | `https://farmenta.fun/` | Target of the "Launch App" button |
 
 ## Structure
 
@@ -45,9 +45,3 @@ The site uses the same palette as the Farmenta app, sampled from the logo:
 - **warm = risk, and only risk**: `warning` and `danger` callouts, and the risk section card
 
 Nothing neutral renders orange or red, and there is no green. The site is dark only. Type: Plus Jakarta Sans (headings), Inter (body), JetBrains Mono (code, addresses).
-
-## After the contracts are deployed
-
-1. Fill the "Farmenta contracts" table in `docs/reference/addresses.md`.
-2. Remove the "Contracts are not deployed yet" note in `docs/intro.md`.
-3. Set `DOCS_URL`.
