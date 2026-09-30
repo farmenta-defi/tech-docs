@@ -40,8 +40,8 @@ The USDG that Budi borrowed came from lenders such as Lina, who supplied USDG to
 
 ## Current status
 
-:::info[Contracts are not deployed yet]
-Farmenta's own contracts have not been deployed. Their addresses will be published on the [contract addresses](./reference/addresses.md) page at deployment. Everything in these docs describes how the protocol is designed and implemented to behave.
+:::info[Deployed on Robinhood Chain]
+Farmenta's contracts are deployed on Robinhood Chain (chain id 4663). Their addresses are on the [contract addresses](./reference/addresses.md) page.
 :::
 
 Before you supply or borrow, read [risk and security](./risk/overview.md). It explains who carries which risk and what limits it.

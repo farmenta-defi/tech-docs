@@ -12,7 +12,7 @@ Nothing is accepted automatically. The owner lists each pool one by one, and the
 
 A small example: the Blue-chip preset allows a max LTV of 65% and a liquidation threshold of 75%. The owner can list an ETH/USDG pool at 60% and 70%. A listing at 65% and 80% reverts with `LooserThanPreset("lt")`.
 
-The policy has no external dependency. It reads no position, calls no oracle and holds no funds. Its address is published on the [addresses page](./addresses.md) after deployment.
+The policy has no external dependency. It reads no position, calls no oracle and holds no funds. Its address is on the [addresses page](./addresses.md).
 
 ## Contract summary
 

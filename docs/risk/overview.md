@@ -11,7 +11,7 @@ Farmenta works like a pawnshop that accepts an item whose price moves every seco
 This section lists those dependencies, who carries each risk, and what limits it. Read it before you supply USDG, deposit a position, or run a liquidation bot.
 
 :::info[Security status]
-Farmenta's contracts are open source and are not deployed yet. They have not been audited yet. The market contract is upgradeable, and its owner is a timelock contract: every owner call is scheduled on-chain and runs two days later at the earliest, and an upgrade about four days later. See [Owner powers and upgradeability](./admin-powers.md).
+Farmenta's contracts are open source and deployed on Robinhood Chain. They have not been audited yet. The market contract is upgradeable, and its owner is a timelock contract: every owner call is scheduled on-chain and runs two days later at the earliest, and an upgrade about four days later. See [Owner powers and upgradeability](./admin-powers.md).
 :::
 
 ## A small example

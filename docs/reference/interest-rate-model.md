@@ -12,7 +12,7 @@ The curve works like surge pricing. While plenty of USDG is idle, borrowing is c
 
 A small example: the Blue-chip market holds 20,000 USDG of cash and borrowers owe 80,000 USDG. Utilization is `80,000 / (20,000 + 80,000)`, or 80%, which is the kink of the Blue-chip curve, and the borrow rate is 4% per year. At 90% utilization the rate is 34% per year.
 
-The model is one contract that carries the curves of both tiers. It has no state, no owner and no settings. Its address is published on the [addresses page](./addresses.md) after deployment.
+The model is one contract that carries the curves of both tiers. It has no state, no owner and no settings. Its address is on the [addresses page](./addresses.md).
 
 ## Contract summary
 
@@ -155,7 +155,7 @@ The rate a borrower pays is not the rate a lender earns. Lenders receive the int
 ```ts
 import { createPublicClient, erc20Abi, http, parseAbi } from 'viem'
 
-// Placeholders. Farmenta addresses are published on the addresses page after deployment.
+// Placeholder. Copy the address of your market from the addresses page.
 const MARKET_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const marketAbi = parseAbi([

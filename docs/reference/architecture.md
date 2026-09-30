@@ -61,7 +61,7 @@ An arrow means "calls or reads". The two proxies share one implementation, so bo
 
 Every event and every custom error is listed on the [events](./events.md) and [errors](./errors.md) pages. The numbers behind the terms are on the [risk parameters](./risk-parameters.md) page.
 
-Farmenta contract addresses are published on the [addresses page](./addresses.md) after deployment.
+Farmenta contract addresses are on the [addresses page](./addresses.md).
 
 ### External contracts
 

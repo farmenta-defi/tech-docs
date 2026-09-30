@@ -26,7 +26,7 @@ Exactly two. The reserve factor takes a share of the interest borrowers pay (15%
 
 ### Where are the contract addresses?
 
-Farmenta's own contracts are not deployed yet. When they are, their addresses will be published on the [Addresses](../reference/addresses.md) page. Do not trust an address from any other source.
+Farmenta's own contracts are deployed on Robinhood Chain, and their addresses are on the [Addresses](../reference/addresses.md) page. Do not trust an address from any other source.
 
 ### Does Farmenta have its own pools or its own NFT?
 

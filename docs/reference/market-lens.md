@@ -26,7 +26,7 @@ constructor(FarmentaMarket market_)
 
 The constructor reads the market's asset, policy, valuer and oracle once and keeps them as immutables. It reverts with `MarketNotInitialized()` if the market proxy has not been initialized yet.
 
-The lens is not upgradeable. When a market upgrade changes the policy, valuer or oracle, the old lens would keep reading the old contracts, so a new lens is deployed for that market. Always take the lens address from the [addresses page](./addresses.md), where Farmenta addresses are published after deployment.
+The lens is not upgradeable. When a market upgrade changes the policy, valuer or oracle, the old lens would keep reading the old contracts, so a new lens is deployed for that market. Always take the lens address from the [addresses page](./addresses.md).
 
 ```solidity
 FarmentaMarket public immutable market;
@@ -191,7 +191,7 @@ Views return early, without reading any price, when there is nothing to price: `
 ```ts
 import { createPublicClient, http, parseAbi, formatUnits } from 'viem'
 
-// Placeholder. Farmenta addresses are published on the addresses page after deployment.
+// Placeholder. Copy the lens address of your market from the addresses page.
 const MARKET_LENS_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const lensAbi = parseAbi([

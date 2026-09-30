@@ -12,7 +12,7 @@ There are two markets, Blue-chip and Meme. Both are proxies of the same implemen
 
 A small example: Lina deposits 1,000 USDG with `deposit` and receives `fUSDG-BC` shares. Budi deposits a position worth $10,000 with `depositCollateral`. With a max LTV of 65% he can call `borrow` for up to $6,500 worth of USDG, and he gets his NFT back with `withdrawCollateral` once he has repaid everything.
 
-Market addresses are published on the [addresses page](./addresses.md) after deployment.
+Market addresses are on the [addresses page](./addresses.md).
 
 ## Contract summary
 

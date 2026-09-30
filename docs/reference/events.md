@@ -12,7 +12,7 @@ Think of them as the receipts of the protocol: one line per action, printed at t
 
 A small example: Budi borrows 1,500 USDG against position 1234. The market emits `Borrow(1234, poolId, 1500000000)`. A consumer that wants every loan of one pool filters `Borrow` by the `poolId` topic.
 
-Signatures on this page are copied from the code. An argument marked `indexed` is a log topic and can be used as a filter. Contract addresses are published on the [addresses page](./addresses.md) after deployment.
+Signatures on this page are copied from the code. An argument marked `indexed` is a log topic and can be used as a filter. Contract addresses are on the [addresses page](./addresses.md).
 
 ## How to read market events
 

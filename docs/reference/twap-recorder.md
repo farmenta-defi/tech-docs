@@ -16,7 +16,7 @@ A small example: a pool sat at tick 1,000 for the first 1,200 seconds of the win
 (1,000 × 1,200 + 1,300 × 600) / 1,800 = 1,100
 ```
 
-The recorder has no owner, holds no funds and cannot be changed. Its address is published on the [addresses page](./addresses.md) after deployment.
+The recorder has no owner, holds no funds and cannot be changed. Its address is on the [addresses page](./addresses.md).
 
 ## Contract summary
 
@@ -85,7 +85,7 @@ Records several pools in one transaction. Each pool is handled on its own. A poo
 import { createWalletClient, defineChain, http, parseAbi } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 
-// Placeholder. Farmenta addresses are published on the addresses page after deployment.
+// Placeholder. Copy the recorder's address from the addresses page.
 const TWAP_RECORDER_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const recorderAbi = parseAbi([

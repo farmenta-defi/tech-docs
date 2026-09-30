@@ -16,7 +16,7 @@ A small example: Rina sees a Blue-chip position with 1,000 USDG of debt and a he
 The helper is a convenience contract outside the core protocol. The market does not know it exists. You can call `liquidate` on the market directly, or write your own helper. For the full workflow see the [liquidator guide](../liquidations/liquidator-guide.md).
 :::
 
-Helper addresses are published on the [addresses page](./addresses.md) after deployment.
+Helper addresses are on the [addresses page](./addresses.md).
 
 ## Contract summary
 

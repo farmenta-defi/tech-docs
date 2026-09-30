@@ -12,7 +12,7 @@ The oracle has two price surfaces: one for borrowing and one for liquidation. Th
 
 A small example: a meme token trades at $0.0010 in its pool and its 30 minute TWAP is $0.0012. For borrowing the oracle returns the lower of the two, $0.0010. For liquidation it returns the TWAP, $0.0012, because the spot price is not more than 25% below it.
 
-The oracle has no owner and cannot be changed. Its address is published on the [addresses page](./addresses.md) after deployment.
+The oracle has no owner and cannot be changed. Its address is on the [addresses page](./addresses.md).
 
 ## Contract summary
 

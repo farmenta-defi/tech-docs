@@ -17,7 +17,7 @@ principalUsd = 1.2 × 2,500 + 2,000 × 1.00 = 5,000
 feesUsd      = 0.01 × 2,500 + 30 × 1.00   = 55
 ```
 
-The valuer is stateless, has no owner and no settings. Its address is published on the [addresses page](./addresses.md) after deployment.
+The valuer is stateless, has no owner and no settings. Its address is on the [addresses page](./addresses.md).
 
 ## Contract summary
 
