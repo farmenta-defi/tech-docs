@@ -14,7 +14,7 @@ Debt that remains after a position has been fully liquidated and its collateral 
 
 ### Blue-chip market
 
-The market that accepts ETH/USDG and WETH/USDG positions as collateral. It has the looser parameters of the two markets (max LTV 65%, LT 75%) and prices ETH with Chainlink. See [Markets](../overview/markets.md).
+The market that accepts positions in the ETH/USDG, META/USDG and NVDA/USDG pools as collateral. It has the looser parameters of the two markets (max LTV up to 65%, LT up to 75%) and prices its tokens with Chainlink. See [Markets](../overview/markets.md).
 
 ### Borrow index
 
@@ -132,7 +132,7 @@ LTV (loan to value) is `debtUsd / collateralValue`. Max LTV is the highest LTV a
 
 ### Meme market
 
-The market that accepts meme token/USDG positions as collateral. It has much stricter parameters (max LTV 30%, LT 40%, small debt caps) and prices the meme token from the pool itself, using the 30 minute TWAP and the spot price. See [Markets](../overview/markets.md).
+The market that accepts meme token/USDG positions as collateral: the CASHCAT/USDG, PONS/USDG and AI/USDG pools are listed. It has much stricter parameters (max LTV 30%, LT 40%, small debt caps) and prices the meme token from the pool itself, using the 30 minute TWAP and the spot price. See [Markets](../overview/markets.md).
 
 ## O
 

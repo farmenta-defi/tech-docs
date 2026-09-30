@@ -22,7 +22,7 @@ The short answer is that the protocol charges a fee in only two places: a share 
 
 ## The market
 
-The example takes place in the **Blue-chip market**, which accepts ETH/USDG and WETH/USDG positions. These are its parameters.
+The example takes place in the **Blue-chip market**, with a position in the ETH/USDG pool. These are that pool's parameters.
 
 | Parameter | Value | What it means |
 |---|---|---|

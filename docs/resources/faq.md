@@ -18,7 +18,7 @@ Robinhood Chain, chain id 4663, an Arbitrum Orbit rollup that settles to Ethereu
 
 ### What is the difference between the two markets?
 
-The Blue-chip market accepts ETH/USDG and WETH/USDG positions, with a max LTV of 65% and a liquidation threshold of 75%. The Meme market accepts meme token/USDG positions, with a max LTV of 30%, a liquidation threshold of 40% and much smaller debt caps. Each market has its own USDG vault, its own share token and its own interest curve. See [Markets](../overview/markets.md).
+The Blue-chip market accepts positions in the ETH/USDG, META/USDG and NVDA/USDG pools, with a max LTV of up to 65% and a liquidation threshold of up to 75%. The Meme market accepts positions in the CASHCAT/USDG, PONS/USDG and AI/USDG pools, with a max LTV of 30%, a liquidation threshold of 40% and much smaller debt caps. Each market has its own USDG vault, its own share token and its own interest curve. See [Markets](../overview/markets.md).
 
 ### What fees does Farmenta charge?
 
@@ -62,7 +62,7 @@ Partly. The whole reserve is used to absorb bad debt before lenders are touched.
 
 ### Which positions can I use as collateral?
 
-Uniswap v4 positions from pools that the owner has listed one by one. Every accepted pool has USDG as one of its tokens: ETH/USDG and WETH/USDG in the Blue-chip market, meme token/USDG in the Meme market. The position must hold liquidity and be worth at least the pool's minimum, $50 or more. See [Collateral](../concepts/collateral.md) and [Pool listing](../concepts/pool-listing.md).
+Uniswap v4 positions from pools that the owner has listed one by one. Every accepted pool has USDG as one of its tokens: ETH/USDG, META/USDG and NVDA/USDG in the Blue-chip market, CASHCAT/USDG, PONS/USDG and AI/USDG in the Meme market. The position must hold liquidity and be worth at least the pool's minimum, $50 or more. See [Collateral](../concepts/collateral.md) and [Pool listing](../concepts/pool-listing.md).
 
 ### Do I keep earning Uniswap fees while my position is collateral?
 

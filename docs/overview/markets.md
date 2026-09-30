@@ -10,7 +10,7 @@ Think of two separate safes in the same building. The building and the staff are
 
 | | Blue-chip market | Meme market |
 |---|---|---|
-| Collateral accepted | Positions in ETH/USDG and WETH/USDG pools | Positions in meme token/USDG pools |
+| Collateral accepted | Positions in the listed ETH/USDG, META/USDG and NVDA/USDG pools | Positions in the listed CASHCAT/USDG, PONS/USDG and AI/USDG pools |
 | Asset lent | USDG | USDG |
 | Lender share token | `fUSDG-BC` | `fUSDG-MEME` |
 | Price source for the risk token | Chainlink | On-chain 30 minute TWAP |
@@ -40,9 +40,24 @@ The numbers below are the presets of each market. They are also the loosest valu
 | Share of interest kept as reserve | 15% | 25% |
 | Reserve floor | 1% of lender funds | 2.5% of lender funds |
 
-A quick way to read this table: with a position worth $10,000 you can borrow up to $6,500 in the Blue-chip market and up to $3,000 in the Meme market. The loan becomes liquidatable when the debt rises above 75% of the position's value in Blue-chip and above 40% in Meme.
+A quick way to read this table: at these presets, with a position worth $10,000 you can borrow up to $6,500 in the Blue-chip market and up to $3,000 in the Meme market. The loan becomes liquidatable when the debt rises above 75% of the position's value in Blue-chip and above 40% in Meme.
 
 The full list, including the interest curves and oracle settings, is on the [risk parameters](../reference/risk-parameters.md) page.
+
+## Listed pools
+
+Six pools are listed, three in each market. ETH/USDG and the three meme pools are listed at their market's preset max LTV and liquidation threshold. META/USDG and NVDA/USDG, which pair a tokenized stock with USDG, are listed with stricter ones. Every pool has a debt cap below the most its market allows, and a minimum position value of $50.
+
+| Pool | Market | Max LTV | Liquidation threshold | Liquidator bonus | Debt cap |
+|---|---|---|---|---|---|
+| ETH/USDG | Blue-chip | 65% | 75% | 5% | 25,000 USDG |
+| META/USDG | Blue-chip | 50% | 65% | 5% | 25,000 USDG |
+| NVDA/USDG | Blue-chip | 50% | 65% | 5% | 25,000 USDG |
+| CASHCAT/USDG | Meme | 30% | 40% | 10% | 3,000 USDG |
+| PONS/USDG | Meme | 30% | 40% | 10% | 3,000 USDG |
+| AI/USDG | Meme | 30% | 40% | 10% | 3,000 USDG |
+
+The terms in force for a pool are the ones `termsOf(poolId)` on the policy returns. The owner can change them within the presets of the pool's market, see [pool listing](../concepts/pool-listing.md). Token addresses are on the [addresses page](../reference/addresses.md).
 
 ## What decides the market of a position
 
@@ -52,12 +67,12 @@ Every accepted pair is quoted in USDG. Pairs between two risk tokens are not acc
 
 ## How prices differ between the markets
 
-In the **Blue-chip market**, ETH and USDG are priced by Chainlink. The pool's own price is only used as a cross check: a borrow is rejected if the pool price is more than 2% away from the Chainlink price.
+In the **Blue-chip market**, ETH, META, NVDA and USDG are priced by Chainlink. The pool's own price is only used as a cross check: a borrow is rejected if the pool price is more than 2% away from the Chainlink price.
 
 In the **Meme market**, there is no Chainlink feed for the meme token. The price comes from a time weighted average of the pool price over the last 30 minutes, recorded on-chain. Borrowing uses the lower of the current pool price and that average. See [price oracles and price gates](../concepts/price-oracles.md).
 
 :::warning[The Meme market carries more risk]
-Prices of meme tokens can be moved more easily than the price of ETH, and a meme token can lose nearly all of its value. Meme pools are not listed with real funds until a guard against single transaction price manipulation is in place. Read [oracle, market and chain risks](../risk/oracle-and-market-risks.md) before you supply to or borrow from this market.
+Prices of meme tokens can be moved more easily than the price of ETH, and a meme token can lose nearly all of its value. Three meme pools are listed, each with a debt cap of 3,000 USDG. Read [oracle, market and chain risks](../risk/oracle-and-market-risks.md) before you supply to or borrow from this market.
 :::
 
 ## Isolation in practice
