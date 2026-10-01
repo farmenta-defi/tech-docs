@@ -174,7 +174,7 @@ If price moves or interest have already pushed your LTV above the pool's max LTV
 
 The app sends all three for you, from the row of a deposited position on the Portfolio page. The recipient is always the connected wallet.
 
-- **Collect fees** opens a panel. Its button names what you receive in each token, for example "Collect 0.0005 ETH and 1.13 USDG". A position with a loan also shows a note that the fees count as collateral. The same button is on the pool's page. It is hidden while the position has no fees.
+- **Collect fees** opens a panel that shows what you receive in each token, for example "0.0005 ETH and 1.13 USDG", with the button that collects it. A position with a loan also shows a note that the fees count as collateral. On the pool's page the same amounts and a "Collect" button are in the card of the selected position. Both are hidden while the position has no fees.
 - **Add liquidity** opens a panel where you choose to add 25%, 50% or 100% of the liquidity the position already holds. For each token it shows what the addition takes at the pool's price now, the most you agree to pay, and what your wallet holds. Your wallet is asked three things in turn: to approve each ERC-20 token for exactly its maximum, to sign a Permit2 permit for the same amounts, and to confirm the transaction. In the ETH pool the ETH is sent with the transaction and needs no approval. What the addition does not take comes back in the same transaction, together with the position's fees.
 - **Remove liquidity** opens a panel where you choose 25%, 50% or 75% of the position's liquidity. For each token it shows the principal the pool pays now, the fees that leave with it, and the minimum the transaction accepts.
 

@@ -70,7 +70,7 @@ Yes. The position stays in its pool and keeps earning trading fees, and those fe
 
 ### Can I claim those fees?
 
-Yes, with `collectFees`. In the app it is the "Collect fees" button on the position's row on the Portfolio page, and on the pool's page. If you have debt, the claim passes the same price checks as a borrow, and your health factor must be at least 1 after the fees have left. With no debt there is no such check. Claims are stopped while the market is paused. See [Managing collateral](../concepts/managing-collateral.md).
+Yes, with `collectFees`. In the app it is the "Collect fees" button on the position's row on the Portfolio page, and the "Collect" button in the position's card on the pool's page. If you have debt, the claim passes the same price checks as a borrow, and your health factor must be at least 1 after the fees have left. With no debt there is no such check. Claims are stopped while the market is paused. See [Managing collateral](../concepts/managing-collateral.md).
 
 ### How is my position valued?
 
