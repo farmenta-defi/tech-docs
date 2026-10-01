@@ -56,7 +56,7 @@ The Meme market has no Chainlink feed for the risk token. Its price comes from t
 
 ### TWAP manipulation in thin pools
 
-The TWAP is an average of the pool's price over the last 30 minutes. Pushing the price of a thin pool for a short time moves the average only partly, and at borrow time the contract takes the lower of spot and TWAP, so pumping the price does not let anyone borrow more. A pool-based price can still be influenced in a thin pool, within one transaction or by holding the price over time. `min(spot, TWAP)` limits this on the borrowing side. For the liquidation side, a guard that limits how far a single observation can move the price is decided and not in place yet, which is why Meme pools are not listed with real funds until it is.
+The TWAP is an average of the pool's price over the last 30 minutes. Pushing the price of a thin pool for a short time moves the average only partly, and at borrow time the contract takes the lower of spot and TWAP, so pumping the price does not let anyone borrow more. A pool-based price can still be influenced in a thin pool, within one transaction or by holding the price over time. `min(spot, TWAP)` limits this on the borrowing side. For the liquidation side, a guard that limits how far a single observation can move the price is decided and not in place yet.
 
 ### Stale mode
 
@@ -82,8 +82,6 @@ During a real crash the TWAP lags behind. To keep liquidations working, the cont
 :::warning[The crash branch reads the current pool price]
 The crash branch uses the pool's price at that moment, and a pool's price can be moved within a single transaction. A price move of more than 25% can therefore make Meme loans liquidatable, including loans opened at max LTV, because the distance from max LTV to LT in the Meme market is also 25%. The debt cap per pool does not prevent this.
 :::
-
-**Current policy:** Meme pools are not listed with real funds until a price guard against single transaction price moves is in place. The same guard covers the spot price used in stale mode.
 
 ### Rug risk and how bad debt scales with the cap
 
