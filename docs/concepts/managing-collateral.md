@@ -108,6 +108,21 @@ function decreaseLiquidity(
 - **`liq = 0` is rejected** with `ZeroLiquidity`. Use `collectFees`.
 - **More than the position holds is rejected** with `LiquidityExceedsPosition`.
 
+### Sizing the minimums
+
+Take the principal of the slice from the pool, at the pool's own price, and subtract your slippage tolerance:
+
+```text
+min0 = quoted principal of currency0 × (1 − tolerance), rounded down
+min1 = quoted principal of currency1 × (1 − tolerance), rounded down
+```
+
+Do not size them from `PositionValuer.value`. The valuer splits a position at the price derived from the oracle, and the pool pays at its spot price. On the Blue-chip market a position with a loan may remove liquidity while the two are up to 2% apart, and a small difference in price is a larger difference in how much of each token a position holds. A minimum taken from the valuer can be above what the pool pays, and the removal then reverts with `MinimumAmountInsufficient` although no price has moved.
+
+One way to read the exact figure is to simulate the call with a minimum that cannot be met. `PositionManager` reverts with `MinimumAmountInsufficient(minimumAmount, amountReceived)`, and `amountReceived` is the principal the pool would pay for that token, fees apart. Simulate once with `min0` at the maximum and `min1` at zero, and once the other way round.
+
+If the price moves past your minimums before the transaction is mined, the removal reverts and nothing leaves the position. Take a new quote instead of widening the tolerance.
+
 ### The minimum value floor
 
 What stays in custody must still clear the pool's minimum position value ($5 or more), measured exactly as at deposit: principal after the removal haircut, fees excluded.
@@ -139,6 +154,19 @@ If the check fails, the call reverts with `RemovalExceedsBorrowLimit`.
 :::warning[A position above max LTV cannot remove liquidity]
 If price moves or interest have already pushed your LTV above the pool's max LTV, every removal is refused until you repay part of the debt.
 :::
+
+## In the Farmenta app
+
+The app sends two of the three for you, from the row of a deposited position on the Portfolio page. The recipient is always the connected wallet.
+
+- **Collect fees** opens a panel. Its button names what you receive in each token, for example "Collect 0.0005 ETH and 1.13 USDG". A position with a loan also shows a note that the fees count as collateral. The same button is on the pool's page. It is hidden while the position has no fees.
+- **Remove liquidity** opens a panel where you choose 25%, 50% or 75% of the position's liquidity. For each token it shows the principal the pool pays now, the fees that leave with it, and the minimum the transaction accepts. The quote is read from the pool and refreshed every 15 seconds.
+
+The slippage tolerance in that panel is 0.5% of each token unless you change it. Above 1% the panel shows a warning, and above 5% it refuses. If the price moves past the minimums, nothing is sent and the panel offers a new quote at the same tolerance.
+
+Every call is simulated before your wallet is asked to sign. A refusal is shown as a sentence, with what to do about it: remove less, or repay part of the loan.
+
+Adding liquidity is not in the app. `increaseLiquidity` is called on the contract directly.
 
 ## Rules shared by all three
 
