@@ -490,7 +490,6 @@ Checks, in order:
 | The USDG price is within 0.97 to 1.03 | `UsdgPriceOutOfBounds(price)` |
 | Blue-chip only: the pool's spot price is within 200 basis points of the oracle price | `SpotPriceDeviation(deviationBps, maximumDeviationBps)` |
 | Debt after the borrow, in USD, is at most collateral value times max LTV | `BorrowExceedsMaxLtv(requestedDebt, maximumDebt)` |
-| Debt after the borrow is at least 10 USDG | `BorrowBelowMinimum(debt)` |
 | Pool debt after the borrow is at most the pool's debt cap | `PoolDebtCapExceeded(poolId, requestedDebt, debtCap)` |
 | Market debt after the borrow is at most the tier's market debt cap | `MarketDebtCapExceeded(requestedDebt, debtCap)` |
 

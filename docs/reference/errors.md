@@ -46,7 +46,7 @@ Collateral admission, `mintAndDeposit` and `increaseLiquidity`.
 |---|---|---|
 | `PositionAlreadyHeld(uint256 tokenId)` | The market already has a record for this position. | Nothing to do. The position is already collateral. |
 | `PositionIsEmpty(uint256 tokenId)` | The position has no liquidity. | Add liquidity on Uniswap before you deposit, or use `mintAndDeposit`. |
-| `PositionBelowMinimum(uint256 principalUsd, uint256 minimumUsd)` | The principal of the position, after the removal haircut and without fees, is below the pool's minimum position value. | Deposit a larger position. The preset minimum is $50. |
+| `PositionBelowMinimum(uint256 principalUsd, uint256 minimumUsd)` | The principal of the position, after the removal haircut and without fees, is below the pool's minimum position value. | Deposit a larger position. The preset minimum is $5. |
 | `NativeValueMismatch(uint256 expected, uint256 sent)` | `mintAndDeposit`, `increaseLiquidity`: `msg.value` is wrong. | Send exactly `amount0Max` as value for a native ETH pool, and no value for an ERC-20 pair. |
 | `PermitDoesNotMatchPool()` | `mintAndDeposit`, `increaseLiquidity`: the Permit2 batch does not list exactly the pool's ERC-20 currencies in pool order. | List `currency0` then `currency1` for an ERC-20 pair, and only `currency1` for a native ETH pool. |
 | `ZeroLiquidity()` | `increaseLiquidity` was called with zero liquidity. | To claim fees, call `collectFees`. |
@@ -65,7 +65,6 @@ Collateral admission, `mintAndDeposit` and `increaseLiquidity`.
 | `UsdgPriceOutOfBounds(uint256 price)` | The USDG price is below 0.97 or above 1.03. Actions that take value out of a position with debt are stopped. | Wait until USDG is back inside the range. Repaying is not affected. |
 | `SpotPriceDeviation(uint256 deviationBps, uint256 maximumDeviationBps)` | Blue-chip market: the pool's spot price is more than 200 basis points away from the oracle price. | Wait until the pool and the oracle agree again. This gate protects against a manipulated pool. |
 | `BorrowExceedsMaxLtv(uint256 requestedDebt, uint256 maximumDebt)` | `borrow`: the debt after the borrow would be above collateral value times max LTV. Both arguments are in USD scaled by 1e18. | Borrow less. Read `maxBorrow` on the lens first. |
-| `BorrowBelowMinimum(uint256 debt)` | `borrow`: the debt after the borrow would be under 10 USDG. | Borrow at least 10 USDG in total. |
 | `PoolDebtCapExceeded(PoolId poolId, uint256 requestedDebt, uint256 debtCap)` | `borrow`: the total debt against this pool would be above the pool's debt cap. | Borrow less, or wait for other borrowers to repay. Room left is `debtCap` minus `poolDebt(poolId)`. |
 | `MarketDebtCapExceeded(uint256 requestedDebt, uint256 debtCap)` | `borrow`: the total debt of the market would be above the market debt cap. | Borrow less, or wait for other borrowers to repay. |
 | `PositionWouldBeUnhealthy(uint256 tokenId, uint256 healthFactor)` | `collectFees`, `increaseLiquidity`: the health factor after the action would be below 1. `healthFactor` is the value it would have. | Repay part of the debt first. For `increaseLiquidity`, add more liquidity, because the fees are claimed out of the collateral first. |

@@ -108,7 +108,7 @@ Each tier has a preset. The preset is also the loosest value the contract accept
 | Liquidation threshold | 75% | 40% | Lower |
 | Liquidator bonus | 5% | 10% | Higher |
 | Debt cap per pool | 500,000 USDG | 20,000 USDG | Smaller |
-| Minimum position value | $50 | $50 | Higher |
+| Minimum position value | $5 | $5 | Higher |
 | Removal haircut (ceiling) | 20% | 20% | At or below the ceiling |
 
 A looser value reverts with `LooserThanPreset`. A removal haircut above the ceiling reverts with `HaircutTooLarge`. "Stricter" is measured against the tier preset, not against the pool's previous terms: `updateTerms` can move a parameter in either direction as long as it stays within the preset.

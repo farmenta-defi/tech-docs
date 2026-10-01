@@ -35,8 +35,8 @@ The numbers below are the presets of each market. They are also the loosest valu
 | Close factor | 50%, or 100% if the health factor is below 0.9 or the debt is below 100 USDG | 100% |
 | Debt cap per pool, at most | 500,000 USDG | 20,000 USDG |
 | Debt cap for the whole market | 500,000 USDG | 50,000 USDG |
-| Minimum debt | 10 USDG | 10 USDG |
-| Minimum position value | $50 | $50 |
+| Minimum debt | None | None |
+| Minimum position value | $5 | $5 |
 | Share of interest kept as reserve | 15% | 25% |
 | Reserve floor | 1% of lender funds | 2.5% of lender funds |
 
@@ -46,7 +46,7 @@ The full list, including the interest curves and oracle settings, is on the [ris
 
 ## Listed pools
 
-Six pools are listed, three in each market. ETH/USDG and the three meme pools are listed at their market's preset max LTV and liquidation threshold. META/USDG and NVDA/USDG, which pair a tokenized stock with USDG, are listed with stricter ones. Every pool has a debt cap below the most its market allows, and a minimum position value of $50.
+Six pools are listed, three in each market. ETH/USDG and the three meme pools are listed at their market's preset max LTV and liquidation threshold. META/USDG and NVDA/USDG, which pair a tokenized stock with USDG, are listed with stricter ones. Every pool has a debt cap below the most its market allows, and a minimum position value of $5.
 
 | Pool | Market | Max LTV | Liquidation threshold | Liquidator bonus | Debt cap |
 |---|---|---|---|---|---|

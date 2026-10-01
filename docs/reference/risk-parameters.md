@@ -58,7 +58,7 @@ The Blue-chip and Meme columns show the preset, which is also the loosest value 
 | Liquidator bonus | `liquidatorBonusBps` | 5% (500 bps) | 10% (1,000 bps) | The extra collateral value a liquidator receives on top of the debt they repay. It is the gross bonus, before the protocol liquidation fee. |
 | Removal haircut | `removeHaircutBps` | 0% to 20% | 0% to 20% | The share of value that the pool's hook takes when liquidity is removed. Collateral value is reduced by it. It is 0 for a pool whose hook takes nothing. |
 | Pool debt cap | `debtCapUsdg` | 500,000 USDG | 20,000 USDG | The most debt that all loans backed by this pool can owe together. |
-| Minimum position value | `minPositionUsd` | $50 | $50 | The smallest position the market accepts as collateral. |
+| Minimum position value | `minPositionUsd` | $5 | $5 | The smallest position the market accepts as collateral. |
 
 Rules that apply to these values:
 
@@ -116,7 +116,7 @@ Rates are annual. The contract divides the annual rate by 31,536,000 (the second
 
 | Parameter | Value | Meaning |
 |---|---|---|
-| Minimum debt | 10 USDG | A borrow must leave the position with at least 10 USDG of total debt. Smaller loans are not worth liquidating. |
+| Minimum debt | None | `borrow` accepts any amount above zero. |
 | Fee cap | 10% of principal value | Unclaimed fees count as collateral only up to one tenth of the principal value. |
 | Removal haircut ceiling | 20% (2,000 bps) | The largest removal haircut a listing can record. |
 
@@ -164,7 +164,7 @@ For a pool that already has 30 minutes of recorded history, stale mode ends as s
 |---|---|---|
 | Percentages in listings and events | Basis points (bps). 10,000 bps is 100% | `6500` is 65% |
 | USDG amounts (debt, caps, reserves, `repay`) | USDG with 6 decimals | `500000000000` is 500,000 USDG |
-| USD values (prices, position value, `minPositionUsd`) | USD scaled by 1e18 | `50000000000000000000` is $50 |
+| USD values (prices, position value, `minPositionUsd`) | USD scaled by 1e18 | `5000000000000000000` is $5 |
 | Health factor | Scaled by 1e18 | `1000000000000000000` is an HF of 1 |
 | Utilization and interest rates | Scaled by 1e18 | `800000000000000000` is 80% |
 | Tier | Enum | `0` is none, `1` is Blue-chip, `2` is Meme |

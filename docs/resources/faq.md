@@ -78,7 +78,7 @@ The contract reads your position's liquidity and computes the token amounts at t
 
 ### How much can I borrow?
 
-Up to the collateral value times the pool's max LTV: at most 65% in Blue-chip and 30% in Meme. Your total debt must be at least 10 USDG, and the pool's and the market's debt caps must have room. See [Health factor](../concepts/health-factor.md).
+Up to the collateral value times the pool's max LTV: at most 65% in Blue-chip and 30% in Meme. There is no minimum loan. The pool's and the market's debt caps must have room. See [Health factor](../concepts/health-factor.md).
 
 ### Why was my borrow rejected?
 
@@ -88,7 +88,7 @@ A borrow must pass every one of these gates:
 - The pool is listed and not frozen.
 - The USDG price is between 0.97 and 1.03, and no Chainlink price is older than 25 hours.
 - Blue-chip: the pool's spot price is within 2% of the oracle price. Meme: a valid TWAP exists.
-- Your debt after the borrow is within max LTV and at least 10 USDG.
+- Your debt after the borrow is within max LTV.
 - The pool's debt cap and the market's debt cap are not exceeded.
 - The market has enough cash to pay you.
 

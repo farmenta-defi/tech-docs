@@ -102,7 +102,7 @@ Every deposit path runs the same checks. If one fails, the transaction reverts w
 | Quoted in USDG | One of the two currencies is USDG | `PairMustQuoteInUsdg` |
 | Hook permission bits | The hook passes the bit check, or is individually allowlisted | `HookNotPermitted` |
 | Liquidity is not empty | The position holds liquidity greater than zero | `PositionIsEmpty` |
-| Minimum value | Principal after the removal haircut is at least the pool minimum ($50 or more) | `PositionBelowMinimum` |
+| Minimum value | Principal after the removal haircut is at least the pool minimum ($5 or more) | `PositionBelowMinimum` |
 
 The minimum value is measured on principal only. Unclaimed fees do not count toward it, because fees can be claimed one transaction later. See [how positions are valued](./position-valuation.md) and [pool listing](./pool-listing.md).
 

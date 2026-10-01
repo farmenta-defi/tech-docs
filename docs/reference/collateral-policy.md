@@ -149,7 +149,7 @@ The presets live in the `TierPresets` library. They are defaults and also the lo
 | `minLiquidatorBonusBps` | `500` (5%) | `1000` (10%) | higher or equal |
 | `maxDebtCapUsdg` | `500_000e6` (500,000 USDG) | `20_000e6` (20,000 USDG) | lower or equal |
 | `marketDebtCapUsdg` | `500_000e6` (500,000 USDG) | `50_000e6` (50,000 USDG) | fixed per tier, not part of a listing |
-| `minPositionUsd` | `50e18` ($50) | `50e18` ($50) | higher or equal |
+| `minPositionUsd` | `5e18` ($5) | `5e18` ($5) | higher or equal |
 | `maxRemoveHaircutBps` | `2000` (20%) | `2000` (20%) | lower or equal |
 
 Two more constants in the same library are used by the price oracle for meme tokens:

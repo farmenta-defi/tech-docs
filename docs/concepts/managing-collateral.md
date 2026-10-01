@@ -110,7 +110,7 @@ function decreaseLiquidity(
 
 ### The minimum value floor
 
-What stays in custody must still clear the pool's minimum position value ($50 or more), measured exactly as at deposit: principal after the removal haircut, fees excluded.
+What stays in custody must still clear the pool's minimum position value ($5 or more), measured exactly as at deposit: principal after the removal haircut, fees excluded.
 
 ```text
 principalUsd × (1 − removalHaircut) >= minPositionUsd

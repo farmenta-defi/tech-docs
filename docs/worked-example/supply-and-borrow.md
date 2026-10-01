@@ -49,7 +49,7 @@ Before accepting the position, the contract runs every acceptance check:
 - Both tokens are enabled and the pair is quoted in USDG.
 - The pool's hook is permitted.
 - The position is not empty.
-- The principal, after the pool's removal haircut, is worth at least the pool's minimum position value ($50). Unclaimed fees do not count toward this minimum, because they can be claimed a second later.
+- The principal, after the pool's removal haircut, is worth at least the pool's minimum position value ($5). Unclaimed fees do not count toward this minimum, because they can be claimed a second later.
 
 If any check fails, the transaction reverts and Budi keeps his NFT. See [collateral](../concepts/collateral.md) and [pool listing](../concepts/pool-listing.md) for the rules.
 
@@ -112,7 +112,6 @@ The 65% limit is not the only gate. `borrow` reverts if any of the following is 
 | The caller is not the depositor of the position | `BorrowerNotAuthorized` |
 | The pool is frozen, one of its tokens is disabled, or its hook is no longer permitted | `PoolNotOpenForBorrowing` |
 | The new debt would exceed max LTV | `BorrowExceedsMaxLtv` |
-| The position's total debt would be under the 10 USDG minimum | `BorrowBelowMinimum` |
 | The pool's debt would exceed that pool's debt cap | `PoolDebtCapExceeded` |
 | The market's debt would exceed the market cap (500,000 USDG) | `MarketDebtCapExceeded` |
 | The pool's spot price is more than 2% away from the Chainlink price | `SpotPriceDeviation` |

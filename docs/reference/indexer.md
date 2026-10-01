@@ -339,7 +339,7 @@ Sample response of `/pools/:id?t=1789657500` (values are illustrative). `/pools`
   "liquidatorBonusBps": 500,
   "removeHaircutBps": 0,
   "debtCapUsdg": "500000000000",
-  "minPositionUsd": "50000000000000000000",
+  "minPositionUsd": "5000000000000000000",
   "frozen": true,
   "rampLtFromBps": 7500,
   "rampLtTargetBps": 6000,

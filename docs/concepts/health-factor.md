@@ -47,7 +47,7 @@ HF  = collateralValue × LT / debtUsd
 |---|---|---|
 | Max LTV at borrow | 65% | 30% |
 | Liquidation threshold (LT) | 75% | 40% |
-| Minimum debt | 10 USDG | 10 USDG |
+| Minimum debt | None | None |
 | HF right after borrowing the maximum | 1.154 | 1.333 |
 
 These are the loosest values a pool can have. A pool listing can be stricter, with a lower max LTV or a lower LT. See [pool listing](./pool-listing.md) and [risk parameters](../reference/risk-parameters.md).

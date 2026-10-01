@@ -14,23 +14,25 @@ Copy addresses from this page or from the block explorer. Never rebuild an addre
 
 ## Farmenta contracts
 
-The Farmenta contracts are deployed on Robinhood Chain (chain id 4663). The source code of every contract in this table is verified on Sourcify for that chain.
+The Farmenta contracts are deployed on Robinhood Chain (chain id 4663). The source code of every contract in this table is verified on Sourcify for that chain and on the block explorer.
+
+These are the contracts of the deployment of 1 October 2026. They replaced a first deployment of 28 September 2026, whose contracts remain on the chain: its two markets, `0x1f69d27F1ac7415A4252957951900130CB885484` (Blue-chip) and `0x992c879573eeF8bc948fc3f49d5e5C968204E751` (Meme), still let a lender withdraw, and the app no longer uses them.
 
 | Contract | Role | Address | Explorer |
 |---|---|---|---|
-| FarmentaMarket (Blue-chip proxy) | The Blue-chip market: lender vault, NFT custody and debt ledger. Share token `fUSDG-BC` | `0x1f69d27F1ac7415A4252957951900130CB885484` | [View](https://robinhoodchain.blockscout.com/address/0x1f69d27F1ac7415A4252957951900130CB885484) |
-| FarmentaMarket (Meme proxy) | The Meme market: lender vault, NFT custody and debt ledger. Share token `fUSDG-MEME` | `0x992c879573eeF8bc948fc3f49d5e5C968204E751` | [View](https://robinhoodchain.blockscout.com/address/0x992c879573eeF8bc948fc3f49d5e5C968204E751) |
-| FarmentaMarket (implementation) | The code both market proxies run | `0xb59d1dd281D8F76592e1F83E54890BEB62CDb6E8` | [View](https://robinhoodchain.blockscout.com/address/0xb59d1dd281D8F76592e1F83E54890BEB62CDb6E8) |
-| MarketLens (Blue-chip) | Read-only views of the Blue-chip market, such as health factor and maximum borrow | `0x425862c2cC794f22584aA3D9BAf0Fa497Dc89153` | [View](https://robinhoodchain.blockscout.com/address/0x425862c2cC794f22584aA3D9BAf0Fa497Dc89153) |
-| MarketLens (Meme) | Read-only views of the Meme market | `0x7147E8C771Db492162262E4F7F68b06072aDDf93` | [View](https://robinhoodchain.blockscout.com/address/0x7147E8C771Db492162262E4F7F68b06072aDDf93) |
-| CollateralPolicy | Pool listings and the terms of each pool | `0xcC6d1eCA4577983A01849a11F4499d98bD28a2d3` | [View](https://robinhoodchain.blockscout.com/address/0xcC6d1eCA4577983A01849a11F4499d98bD28a2d3) |
-| PriceOracle | USD prices from Chainlink and from the TWAP recorder | `0xb9D453d966f55cd6e5b4E813D75739fE0272E5Ff` | [View](https://robinhoodchain.blockscout.com/address/0xb9D453d966f55cd6e5b4E813D75739fE0272E5Ff) |
-| TwapRecorder | Price observations for meme pools | `0x320307D8e3A1Fad3C4622141a1323B9B854404D4` | [View](https://robinhoodchain.blockscout.com/address/0x320307D8e3A1Fad3C4622141a1323B9B854404D4) |
-| PositionValuer | Turns a position into token amounts and a USD value | `0xb90D1b97738Beb75befDDbF8bF0EA59AF366a0B3` | [View](https://robinhoodchain.blockscout.com/address/0xb90D1b97738Beb75befDDbF8bF0EA59AF366a0B3) |
-| InterestRateModel | The borrow rate curve of each tier | `0x008a71fDC5A2e718895e54165630049F846A80C0` | [View](https://robinhoodchain.blockscout.com/address/0x008a71fDC5A2e718895e54165630049F846A80C0) |
-| LiquidatorHelper (Blue-chip) | Optional helper that liquidates Blue-chip loans with a flash loan in one transaction | `0x48ecD3270110aD3D4db485C8C02154b57b2C7cC7` | [View](https://robinhoodchain.blockscout.com/address/0x48ecD3270110aD3D4db485C8C02154b57b2C7cC7) |
-| LiquidatorHelper (Meme) | Optional helper that liquidates Meme loans with a flash loan in one transaction | `0xA82645980f78e80c6F4e0176d8602e919b165bc4` | [View](https://robinhoodchain.blockscout.com/address/0xA82645980f78e80c6F4e0176d8602e919b165bc4) |
-| TimelockController | The owner of both markets, and of the policy once it has accepted it. Every owner call waits in its queue | `0x20B2d384d5a4303e10355D3a8Bff59e9940Ad5E8` | [View](https://robinhoodchain.blockscout.com/address/0x20B2d384d5a4303e10355D3a8Bff59e9940Ad5E8) |
+| FarmentaMarket (Blue-chip proxy) | The Blue-chip market: lender vault, NFT custody and debt ledger. Share token `fUSDG-BC` | `0x89e20D2bBBbF52Bf8036bF8efd94C81C8386116B` | [View](https://robinhoodchain.blockscout.com/address/0x89e20D2bBBbF52Bf8036bF8efd94C81C8386116B) |
+| FarmentaMarket (Meme proxy) | The Meme market: lender vault, NFT custody and debt ledger. Share token `fUSDG-MEME` | `0x01540c8aA1c13d50dA85406dCa012F9f41169927` | [View](https://robinhoodchain.blockscout.com/address/0x01540c8aA1c13d50dA85406dCa012F9f41169927) |
+| FarmentaMarket (implementation) | The code both market proxies run | `0xc3C3b9f22a1cFA2e6A1b546b8507a04497fBA995` | [View](https://robinhoodchain.blockscout.com/address/0xc3C3b9f22a1cFA2e6A1b546b8507a04497fBA995) |
+| MarketLens (Blue-chip) | Read-only views of the Blue-chip market, such as health factor and maximum borrow | `0x2Bc059954B712DE2c99A7DDc01c8Ed884bF70621` | [View](https://robinhoodchain.blockscout.com/address/0x2Bc059954B712DE2c99A7DDc01c8Ed884bF70621) |
+| MarketLens (Meme) | Read-only views of the Meme market | `0xA8fF2adC5cdaE8e940E5e680CAd2625c7cfaD909` | [View](https://robinhoodchain.blockscout.com/address/0xA8fF2adC5cdaE8e940E5e680CAd2625c7cfaD909) |
+| CollateralPolicy | Pool listings and the terms of each pool | `0x032f7c4744B6f043F92a94C8e257c5A843D544e0` | [View](https://robinhoodchain.blockscout.com/address/0x032f7c4744B6f043F92a94C8e257c5A843D544e0) |
+| PriceOracle | USD prices from Chainlink and from the TWAP recorder | `0x0Bb6FEAceb66640C2AC4fB0E8562C7ea5dfe5fb5` | [View](https://robinhoodchain.blockscout.com/address/0x0Bb6FEAceb66640C2AC4fB0E8562C7ea5dfe5fb5) |
+| TwapRecorder | Price observations for meme pools | `0xEFC4B1A2BbF9B2D61d58e1E8543D9706f0f42484` | [View](https://robinhoodchain.blockscout.com/address/0xEFC4B1A2BbF9B2D61d58e1E8543D9706f0f42484) |
+| PositionValuer | Turns a position into token amounts and a USD value | `0x59D3543BBF93AC2806fB5f81387858e501d90ada` | [View](https://robinhoodchain.blockscout.com/address/0x59D3543BBF93AC2806fB5f81387858e501d90ada) |
+| InterestRateModel | The borrow rate curve of each tier | `0x18b94D05731F99643c4f3b24F311e753d8bEd19c` | [View](https://robinhoodchain.blockscout.com/address/0x18b94D05731F99643c4f3b24F311e753d8bEd19c) |
+| LiquidatorHelper (Blue-chip) | Optional helper that liquidates Blue-chip loans with a flash loan in one transaction | `0x152117B7cE6361494921fc966B7Cd3A09eF85980` | [View](https://robinhoodchain.blockscout.com/address/0x152117B7cE6361494921fc966B7Cd3A09eF85980) |
+| LiquidatorHelper (Meme) | Optional helper that liquidates Meme loans with a flash loan in one transaction | `0x5ab210578cB41ef2972d0117B645c1796d738Fab` | [View](https://robinhoodchain.blockscout.com/address/0x5ab210578cB41ef2972d0117B645c1796d738Fab) |
+| TimelockController | The owner of both markets, and of the policy once it has accepted it. Every owner call waits in its queue | `0xa4fD84DFdd87e4e9f3B49a8323193fde604c21Ff` | [View](https://robinhoodchain.blockscout.com/address/0xa4fD84DFdd87e4e9f3B49a8323193fde604c21Ff) |
 | Guardian | The account that can pause a market and close a pool, a token or a hook to new positions, at once | `0xa6A36ae078a4f1f6A2659951Ea082cB88f16F9F2` | [View](https://robinhoodchain.blockscout.com/address/0xa6A36ae078a4f1f6A2659951Ea082cB88f16F9F2) |
 
 You always interact with the two market proxies, never with the implementation. Each contract is described in the [architecture overview](./architecture.md).

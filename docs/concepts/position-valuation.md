@@ -118,10 +118,10 @@ When a position is liquidated, the health check uses the capped collateral value
 
 ## Why tiny positions are not accepted
 
-Every pool has a minimum position value of at least $50. There are two reasons.
+Every pool has a minimum position value of at least $5. There are two reasons.
 
 1. **Precision.** When one side of a position is only a few of the smallest token units, rounding dominates and the position cannot be valued precisely.
-2. **Liquidations.** Nobody liquidates dust. A loan too small to be worth a liquidator's gas would simply turn into bad debt.
+2. **Liquidations.** A liquidator is paid a share of the debt they repay, so a position has to be large enough for that share to be worth a transaction.
 
 The minimum is measured on principal after the removal haircut, with fees excluded:
 
