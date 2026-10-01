@@ -56,7 +56,7 @@ The Meme market has no Chainlink feed for the risk token. Its price comes from t
 
 ### TWAP manipulation in thin pools
 
-The TWAP is an average of the pool's price over the last 30 minutes. Pushing the price of a thin pool for a short time moves the average only partly, and at borrow time the contract takes the lower of spot and TWAP, so pumping the price does not let anyone borrow more. A pool-based price can still be influenced in a thin pool, within one transaction or by holding the price over time. `min(spot, TWAP)` limits this on the borrowing side. For the liquidation side, a guard that limits how far a single observation can move the price is decided and not in place yet.
+The TWAP is an average of the pool's price over the last 30 minutes. Pushing the price of a thin pool for a short time moves the average only partly, and at borrow time the contract takes the lower of spot and TWAP, so pumping the price does not let anyone borrow more. A pool-based price can still be influenced in a thin pool, within one transaction or by holding the price over time. `min(spot, TWAP)` limits this on the borrowing side.
 
 ### Stale mode
 
