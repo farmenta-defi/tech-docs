@@ -89,6 +89,21 @@ You choose how much liquidity to add and the most you are willing to pay in each
 - **`liquidity = 0` is rejected** with `ZeroLiquidity`. To claim fees only, use `collectFees`.
 - **With debt**, the position passes the price gate and must have `HF >= 1` after the whole action.
 
+### Sizing the maximums
+
+`amount0Max` and `amount1Max` are the only upper bound the contract holds an addition to. Compute what the addition takes of each token at the pool's current price, and add your slippage tolerance:
+
+```text
+amount0Max = need of currency0 at the pool's price × (1 + tolerance), rounded up
+amount1Max = need of currency1 at the pool's price × (1 + tolerance), rounded up
+```
+
+The need follows from the pool's price and tick, the position's range and the liquidity you add, with the same arithmetic the pool uses. Below the range an addition takes only `currency0`, above it only `currency1`, and inside it both.
+
+Sign the permit for exactly these maximums, and approve Permit2 for no more than them. A loose maximum, such as your whole balance, removes the protection: if the pool's price is pushed before your transaction is mined, the same liquidity can cost far more of one token, and the maximum is what makes that addition revert with `MaximumAmountExceeded` instead of paying it.
+
+If the price moves past your maximums, take a new quote instead of widening the tolerance.
+
 One detail surprises people. The fee claim takes counted fees out of the collateral value. If your position is close to `HF = 1` and the addition is too small to replace the fees that left, the call reverts with `PositionWouldBeUnhealthy`. The fix is to add more, not less.
 
 ## Removing liquidity
@@ -157,16 +172,15 @@ If price moves or interest have already pushed your LTV above the pool's max LTV
 
 ## In the Farmenta app
 
-The app sends two of the three for you, from the row of a deposited position on the Portfolio page. The recipient is always the connected wallet.
+The app sends all three for you, from the row of a deposited position on the Portfolio page. The recipient is always the connected wallet.
 
 - **Collect fees** opens a panel. Its button names what you receive in each token, for example "Collect 0.0005 ETH and 1.13 USDG". A position with a loan also shows a note that the fees count as collateral. The same button is on the pool's page. It is hidden while the position has no fees.
-- **Remove liquidity** opens a panel where you choose 25%, 50% or 75% of the position's liquidity. For each token it shows the principal the pool pays now, the fees that leave with it, and the minimum the transaction accepts. The quote is read from the pool and refreshed every 15 seconds.
+- **Add liquidity** opens a panel where you choose to add 25%, 50% or 100% of the liquidity the position already holds. For each token it shows what the addition takes at the pool's price now, the most you agree to pay, and what your wallet holds. Your wallet is asked three things in turn: to approve each ERC-20 token for exactly its maximum, to sign a Permit2 permit for the same amounts, and to confirm the transaction. In the ETH pool the ETH is sent with the transaction and needs no approval. What the addition does not take comes back in the same transaction, together with the position's fees.
+- **Remove liquidity** opens a panel where you choose 25%, 50% or 75% of the position's liquidity. For each token it shows the principal the pool pays now, the fees that leave with it, and the minimum the transaction accepts.
 
-The slippage tolerance in that panel is 0.5% of each token unless you change it. Above 1% the panel shows a warning, and above 5% it refuses. If the price moves past the minimums, nothing is sent and the panel offers a new quote at the same tolerance.
+Both liquidity panels read their quote from the pool and refresh it every 15 seconds. The slippage tolerance is 0.5% of each token unless you change it. Above 1% the panel shows a warning, and above 5% it refuses. If the price moves past the maximums of an addition or the minimums of a removal, nothing is sent and the panel offers a new quote at the same tolerance. For an addition that check runs before anything is approved or signed.
 
-Every call is simulated before your wallet is asked to sign. A refusal is shown as a sentence, with what to do about it: remove less, or repay part of the loan.
-
-Adding liquidity is not in the app. `increaseLiquidity` is called on the contract directly.
+A refusal is shown as a sentence, with what to do about it: remove less, add more, or repay part of the loan.
 
 ## Rules shared by all three
 

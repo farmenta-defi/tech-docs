@@ -209,7 +209,7 @@ These errors are not declared by Farmenta, but you will meet them through the ma
 | `ERC4626ExceededMaxWithdraw(address owner, uint256 assets, uint256 max)` | OpenZeppelin | `withdraw`: more than `maxWithdraw(owner)` was requested. The limit includes the cash in the market. | Withdraw at most `max`, and the rest when cash returns. |
 | `ERC4626ExceededMaxRedeem(address owner, uint256 shares, uint256 max)` | OpenZeppelin | `redeem`: more than `maxRedeem(owner)` was requested. | Redeem at most `max`. |
 | `InvalidInitialization()` | OpenZeppelin | `initialize` was called on a proxy that is already initialized, or on the implementation. | Deployment only. |
-| `MaximumAmountExceeded(uint128 maximumAmount, uint128 amountRequested)` | Uniswap v4 PositionManager | `mintAndDeposit`, `increaseLiquidity`: the liquidity costs more than `amount0Max` or `amount1Max`. | Raise the maximum, or add less liquidity. |
+| `MaximumAmountExceeded(uint128 maximumAmount, uint128 amountRequested)` | Uniswap v4 PositionManager | `mintAndDeposit`, `increaseLiquidity`: the liquidity costs more than `amount0Max` or `amount1Max`. | Take a new quote from the pool and size the maximum from it, or add less liquidity. |
 | `MinimumAmountInsufficient(uint128 minimumAmount, uint128 amountReceived)` | Uniswap v4 PositionManager | `decreaseLiquidity`: the principal returned is below `min0` or `min1`. Fees do not count toward the minimum. | Take a new quote from the pool and size the minimum from the principal of the slice only. |
 
 Permit2 reverts with its own errors for an invalid signature, a used nonce or an expired deadline. A USDG transfer that fails, for example for lack of balance or allowance, reverts inside the token.

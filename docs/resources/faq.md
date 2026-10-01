@@ -96,7 +96,7 @@ The revert reason names the gate that refused. See [Errors](../reference/errors.
 
 ### Can I add or remove liquidity while borrowing?
 
-Yes. `increaseLiquidity` adds to your position, as long as the pool still takes new positions (it is not frozen, its tokens are enabled and its hook is permitted) and your health factor is at least 1 afterwards. `decreaseLiquidity` removes part of it: what remains must stay above the pool's minimum position value, and your debt must still fit the borrowing limit of what remains, not only the liquidation threshold. In the app, "Remove liquidity" on the position's row on the Portfolio page takes out 25%, 50% or 75%; adding liquidity is done on the contract directly. See [Managing collateral](../concepts/managing-collateral.md).
+Yes. `increaseLiquidity` adds to your position, as long as the pool still takes new positions (it is not frozen, its tokens are enabled and its hook is permitted) and your health factor is at least 1 afterwards. `decreaseLiquidity` removes part of it: what remains must stay above the pool's minimum position value, and your debt must still fit the borrowing limit of what remains, not only the liquidation threshold. In the app, "Remove liquidity" on the position's row on the Portfolio page takes out 25%, 50% or 75%, and "Add liquidity" adds 25%, 50% or 100% of what the position holds. See [Managing collateral](../concepts/managing-collateral.md).
 
 ### Will I be liquidated if my position goes out of range?
 
