@@ -62,7 +62,7 @@ Partly. The whole reserve is used to absorb bad debt before lenders are touched.
 
 ### Which positions can I use as collateral?
 
-Uniswap v4 positions from pools that the owner has listed one by one. Every accepted pool has USDG as one of its tokens: ETH/USDG, META/USDG and NVDA/USDG in the Blue-chip market, CASHCAT/USDG, PONS/USDG and AI/USDG in the Meme market. The position must hold liquidity and be worth at least the pool's minimum, $50 or more. See [Collateral](../concepts/collateral.md) and [Pool listing](../concepts/pool-listing.md).
+Uniswap v4 positions from pools that the owner has listed one by one. Every accepted pool has USDG as one of its tokens: ETH/USDG, META/USDG and NVDA/USDG in the Blue-chip market, CASHCAT/USDG, PONS/USDG and AI/USDG in the Meme market. The position must hold liquidity and be worth at least the pool's minimum, $5 or more. See [Collateral](../concepts/collateral.md) and [Pool listing](../concepts/pool-listing.md).
 
 ### Do I keep earning Uniswap fees while my position is collateral?
 
@@ -70,7 +70,7 @@ Yes. The position stays in its pool and keeps earning trading fees, and those fe
 
 ### Can I claim those fees?
 
-Yes, with `collectFees`. If you have debt, the claim passes the same price checks as a borrow, and your health factor must be at least 1 after the fees have left. With no debt there is no such check. Claims are stopped while the market is paused. See [Managing collateral](../concepts/managing-collateral.md).
+Yes, with `collectFees`. In the app it is the "Collect fees" button on the position's row on the Portfolio page, and the "Collect" button in the position's card on the pool's page. If you have debt, the claim passes the same price checks as a borrow, and your health factor must be at least 1 after the fees have left. With no debt there is no such check. Claims are stopped while the market is paused. See [Managing collateral](../concepts/managing-collateral.md).
 
 ### How is my position valued?
 
@@ -96,7 +96,7 @@ The revert reason names the gate that refused. See [Errors](../reference/errors.
 
 ### Can I add or remove liquidity while borrowing?
 
-Yes. `increaseLiquidity` adds to your position, as long as the pool still takes new positions (it is not frozen, its tokens are enabled and its hook is permitted) and your health factor is at least 1 afterwards. `decreaseLiquidity` removes part of it: what remains must stay above the pool's minimum position value, and your debt must still fit the borrowing limit of what remains, not only the liquidation threshold. See [Managing collateral](../concepts/managing-collateral.md).
+Yes. `increaseLiquidity` adds to your position, as long as the pool still takes new positions (it is not frozen, its tokens are enabled and its hook is permitted) and your health factor is at least 1 afterwards. `decreaseLiquidity` removes part of it: what remains must stay above the pool's minimum position value, and your debt must still fit the borrowing limit of what remains, not only the liquidation threshold. In the app, "Remove liquidity" on the position's row on the Portfolio page takes out 25%, 50% or 75%, and "Add liquidity" adds 25%, 50% or 100% of what the position holds. See [Managing collateral](../concepts/managing-collateral.md).
 
 ### Will I be liquidated if my position goes out of range?
 

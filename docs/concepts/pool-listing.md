@@ -37,7 +37,6 @@ The review does not yet screen for per wallet maximums or anti-bot transfer rule
 | Active positions | More than one |
 | Hook | Passes the hook permission bit check, or is reviewed by hand and allowlisted |
 | Meme pools only | The `TwapRecorder` holds at least 30 minutes of price history |
-| Meme pools only | Not listed with real funds until a guard against single transaction price manipulation is in place. See [oracle and market risks](../risk/oracle-and-market-risks.md) |
 
 A hook reviewed by hand is checked for what it does when liquidity is removed or added (can it revert, does it take a cut, does it charge the caller) and whether the hook itself can be upgraded. If a hook takes a cut on removal, that cut is recorded as the pool's removal haircut. A hook that takes more than 20% is not accepted.
 

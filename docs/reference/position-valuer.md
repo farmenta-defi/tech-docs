@@ -137,6 +137,8 @@ feesUsd      = fees0   × price0 / 10^decimals0 + fees1   × price1 / 10^decimal
 
 The mix of tokens in a position depends on the price. If the valuer used the pool's spot price, someone could push the pool to one edge of a position's range for a moment and change what the position appears to hold. Using a price derived from oracles makes the valuation independent of the pool's current state.
 
+For the same reason `amount0` and `amount1` are a valuation and not a quote. A removal of liquidity is paid at the pool's spot price, so its minimums are sized from the pool, not from these amounts. See [Managing collateral](../concepts/managing-collateral.md#sizing-the-minimums).
+
 The three cases for the derived price:
 
 | Derived price | Position holds |

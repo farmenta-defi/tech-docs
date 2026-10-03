@@ -89,6 +89,21 @@ You choose how much liquidity to add and the most you are willing to pay in each
 - **`liquidity = 0` is rejected** with `ZeroLiquidity`. To claim fees only, use `collectFees`.
 - **With debt**, the position passes the price gate and must have `HF >= 1` after the whole action.
 
+### Sizing the maximums
+
+`amount0Max` and `amount1Max` are the only upper bound the contract holds an addition to. Compute what the addition takes of each token at the pool's current price, and add your slippage tolerance:
+
+```text
+amount0Max = need of currency0 at the pool's price × (1 + tolerance), rounded up
+amount1Max = need of currency1 at the pool's price × (1 + tolerance), rounded up
+```
+
+The need follows from the pool's price and tick, the position's range and the liquidity you add, with the same arithmetic the pool uses. Below the range an addition takes only `currency0`, above it only `currency1`, and inside it both.
+
+Sign the permit for exactly these maximums, and approve Permit2 for no more than them. A loose maximum, such as your whole balance, removes the protection: if the pool's price is pushed before your transaction is mined, the same liquidity can cost far more of one token, and the maximum is what makes that addition revert with `MaximumAmountExceeded` instead of paying it.
+
+If the price moves past your maximums, take a new quote instead of widening the tolerance.
+
 One detail surprises people. The fee claim takes counted fees out of the collateral value. If your position is close to `HF = 1` and the addition is too small to replace the fees that left, the call reverts with `PositionWouldBeUnhealthy`. The fix is to add more, not less.
 
 ## Removing liquidity
@@ -107,6 +122,21 @@ function decreaseLiquidity(
 - **`min0` and `min1` bound principal only.** They are your slippage protection: the least amount of each token the removal must return. Fees are paid out as well but never count toward the minimums, so size them from the principal of the slice.
 - **`liq = 0` is rejected** with `ZeroLiquidity`. Use `collectFees`.
 - **More than the position holds is rejected** with `LiquidityExceedsPosition`.
+
+### Sizing the minimums
+
+Take the principal of the slice from the pool, at the pool's own price, and subtract your slippage tolerance:
+
+```text
+min0 = quoted principal of currency0 × (1 − tolerance), rounded down
+min1 = quoted principal of currency1 × (1 − tolerance), rounded down
+```
+
+Do not size them from `PositionValuer.value`. The valuer splits a position at the price derived from the oracle, and the pool pays at its spot price. On the Blue-chip market a position with a loan may remove liquidity while the two are up to 2% apart, and a small difference in price is a larger difference in how much of each token a position holds. A minimum taken from the valuer can be above what the pool pays, and the removal then reverts with `MinimumAmountInsufficient` although no price has moved.
+
+One way to read the exact figure is to simulate the call with a minimum that cannot be met. `PositionManager` reverts with `MinimumAmountInsufficient(minimumAmount, amountReceived)`, and `amountReceived` is the principal the pool would pay for that token, fees apart. Simulate once with `min0` at the maximum and `min1` at zero, and once the other way round.
+
+If the price moves past your minimums before the transaction is mined, the removal reverts and nothing leaves the position. Take a new quote instead of widening the tolerance.
 
 ### The minimum value floor
 
@@ -139,6 +169,18 @@ If the check fails, the call reverts with `RemovalExceedsBorrowLimit`.
 :::warning[A position above max LTV cannot remove liquidity]
 If price moves or interest have already pushed your LTV above the pool's max LTV, every removal is refused until you repay part of the debt.
 :::
+
+## In the Farmenta app
+
+The app sends all three for you, from the row of a deposited position on the Portfolio page. The recipient is always the connected wallet.
+
+- **Collect fees** opens a panel that shows what you receive in each token, for example "0.0005 ETH and 1.13 USDG", with the button that collects it. A position with a loan also shows a note that the fees count as collateral. On the pool's page the same amounts and a "Collect" button are in the card of the selected position. Both are hidden while the position has no fees.
+- **Add liquidity** opens a panel where you choose to add 25%, 50% or 100% of the liquidity the position already holds. For each token it shows what the addition takes at the pool's price now, the most you agree to pay, and what your wallet holds. Your wallet is asked three things in turn: to approve each ERC-20 token for exactly its maximum, to sign a Permit2 permit for the same amounts, and to confirm the transaction. In the ETH pool the ETH is sent with the transaction and needs no approval. What the addition does not take comes back in the same transaction, together with the position's fees.
+- **Remove liquidity** opens a panel where you choose 25%, 50% or 75% of the position's liquidity. For each token it shows the principal the pool pays now, the fees that leave with it, and the minimum the transaction accepts.
+
+Both liquidity panels read their quote from the pool and refresh it every 15 seconds. The slippage tolerance is 0.5% of each token unless you change it. Above 1% the panel shows a warning, and above 5% it refuses. If the price moves past the maximums of an addition or the minimums of a removal, nothing is sent and the panel offers a new quote at the same tolerance. For an addition that check runs before anything is approved or signed.
+
+A refusal is shown as a sentence, with what to do about it: remove less, add more, or repay part of the loan.
 
 ## Rules shared by all three
 
