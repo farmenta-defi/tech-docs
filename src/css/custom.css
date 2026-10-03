@@ -199,6 +199,26 @@ h4 {
   color: var(--brand-300);
 }
 
+.navbar-x-link {
+  display: flex;
+  align-items: center;
+  font-size: 0;
+}
+
+.navbar-x-link::before {
+  content: '';
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18.9 1.2h3.7l-8.1 9.2 9.5 12.5h-7.4l-5.8-7.6-6.6 7.6H.5l8.6-9.8L.2 1.2h7.6L13 8.1z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18.9 1.2h3.7l-8.1 9.2 9.5 12.5h-7.4l-5.8-7.6-6.6 7.6H.5l8.6-9.8L.2 1.2h7.6L13 8.1z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.navbar__link.navbar-x-link::after {
+  display: none;
+}
+
 .navbar-launch-app {
   margin-left: 0.5rem;
   padding: 0.45rem 1rem;
