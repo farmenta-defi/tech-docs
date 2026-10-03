@@ -151,6 +151,14 @@ const config: Config = {
         {type: 'doc', docId: 'risk/overview', position: 'left', label: 'Risk'},
         {href: `${GITHUB_ORG}/smart-contract`, label: 'GitHub', position: 'right'},
         {
+          href: 'https://x.com/farmentafun',
+          label: 'X',
+          position: 'right',
+          className: 'navbar-x-link',
+          target: '_blank',
+          rel: 'noreferrer',
+        },
+        {
           href: APP_URL,
           label: 'Launch App',
           position: 'right',
